@@ -1,5 +1,5 @@
-# *Your Project Description*
-## *Sponsoring Company or Organization*
+# *CS-25-302 Project Description*
+## VCU School of Nursing
 ## *Short Project Description*
 The directory structure in this GitHub is to allow the project to have all its resources self-contained.
 Open Source software should not just be a repository of code.  There are a number of directories to help you and others that will 
@@ -16,8 +16,8 @@ a better understanding of the problems you encountered during the developmemnt o
 ## Project Team
 - *Mentor's Name*  - *Company Affliation* - Mentor
 - *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- *John Leonard* - *Computer Science* - Faculty Advisor
+- *Angela Tran* - *Computer Science* - Student Team Member
+- *Isaiah Hill* - *Computer Science* - Student Team Member
+- *Rachel Farzan* - *Computer Science* - Student Team Member
+- *Prakash Chatlani* - *Computer Science* - Student Team Member
