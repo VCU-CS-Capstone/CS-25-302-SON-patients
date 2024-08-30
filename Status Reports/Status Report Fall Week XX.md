@@ -17,4 +17,3 @@
    - student C needs to learn java
    - database repository costs big $$$
 
-
