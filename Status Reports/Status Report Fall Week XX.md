@@ -16,6 +16,5 @@
 ## 3) Issues, problems or concerns ##
    - student C needs to learn java
    - database repository costs big $$$
-   
 
 
