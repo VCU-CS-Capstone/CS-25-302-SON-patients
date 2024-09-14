@@ -14,7 +14,7 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 1 Status Report |N/A | N/A |N/A |
 | Week 2 Status Report |Met up with members, contacted faculty advisor| Completed team contract, submitted survey |N/A |
 | Week 3 Status Report |Met with Dr. Leonard to better understand project|Submitted team contract|N/A|
-| Week 4 Status Report | | | |
+| Week 4 Status Report |Met with team members, discussed project overview|N/A|Haven't heard from Dr. Sargent|
 | Week 5 Status Report | | | |
 | Week 6 Status Report | | | |
 | Week 7 Status Report | | | |

@@ -36,3 +36,4 @@ Team contract, project proposal, fall design poster, preliminary design report
 | Week 1 | N/A | N/A |
 | Week 2 | Created Discord server, met with team members, wrote team contract, scheduled to meet with Dr. Leonard, submitted team survey | Upload team contract, understand project requirements |
 | Week 3 | Met with Dr. Leonard, submitted team contract, contacted Dr. Sargent | Meet with Dr. Sargent, collect and upload Github screenshots, better understand user requirements |
+| Week 4 | Met with team members, tried to meet with Dr. Sargent but haven't heard from her yet, began discussing project poster| Meet with Dr. Sargent, better understand requirements for design poster
