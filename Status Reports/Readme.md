@@ -19,8 +19,8 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 6 Status Report |Worked on project proposal |Met with CS-303 group, worked on drafting requirements list |Waiting on the sponsors to create a meeting for Redcap, waiting on sponsors to schedule a date/time for visiting the MHWP Clinic
  |
 | Week 7 Status Report |Worked on project proposal|Met again with CS-303 group to discuss project proposal and overlapping goals, looked into RedCAP, distributed remaining project proposal tasks |Waiting on the sponsors to create a meeting for Redcap, waiting on sponsors to schedule a date/time for visiting the MHWP Clinic |
-| Week 8 Status Report | | | |
-| Week 9 Status Report | | | |
+| Week 8 Status Report |Met with sponsors for a meeting about Redcap|Completed Project Proposal|Waiting on sponsors to schedule a date/time for visiting the MHWP Clinic. |
+| Week 9 Status Report |Visited MHWP clinic, created various UI mockups |Gathered user feedback regarding info and design |N/A |
 | Week 10 Status Report | | | |
 | Week 11 Status Report | | | |
 | Week 12 Status Report | | | |
