@@ -21,7 +21,7 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 8 Status Report |Met with sponsors for a meeting about Redcap|Completed Project Proposal|Waiting on sponsors to schedule a date/time for visiting the MHWP Clinic. |
 | Week 9 Status Report |Visited MHWP clinic, created various UI mockups |Gathered user feedback regarding info and design |N/A |
 | Week 10 Status Report |Began working on design poster, began making Figma mockups, split up work|N/A|N/A|
-| Week 11 Status Report | | | |
+| Week 11 Status Report |Continued working on design poster and Figma mockups|N/A|N/A|
 | Week 12 Status Report | | | |
 | Week 13 Status Report | | | |
 | Week 14 Status Report | | | |
