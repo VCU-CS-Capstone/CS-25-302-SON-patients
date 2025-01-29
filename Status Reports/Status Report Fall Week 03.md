@@ -13,13 +13,13 @@ John Leonard
 John Leonard
 
 ## 1) Accomplishments this week ##
-   - Met with Dr. Leonard to better understand the project
-   - Submitted team contract
+   - Met with team
+   - Emailed sponsors about meeting
+   - Finished team contract
 
 ## 2) Milestones to be completed next week ##
-   - Meet with Dr. Sargent
-   - Collect and upload Github screenshots
-   - Begin gathering project requirements
+   - Meet w/ sponsors to discuss mockups
 
 ## 3) Issues, problems or concerns ##
    - N/A
+

@@ -22,19 +22,19 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 9 Status Report |Visited MHWP clinic, created various UI mockups |Gathered user feedback regarding info and design |N/A |
 | Week 10 Status Report |Began working on design poster, began making Figma mockups, split up work|N/A|N/A|
 | Week 11 Status Report |Continued working on design poster and Figma mockups|N/A|N/A|
-| Week 12 Status Report | | | |
-| Week 13 Status Report | | | |
-| Week 14 Status Report | | | |
-| Week 15 Status Report | | | |
-| Week 16 Status Report | | | |
+| Week 12 Status Report |Completed fall design poster|Finished fall design poster|N/A|
+| Week 13 Status Report |Met with other groups about database|N/A|N/A|
+| Week 14 Status Report |Worked on design report|Presented poster|N/A|
+| Week 15 Status Report |Worked on design report|Finished design report|N/A|
+| Week 16 Status Report |N/A|N/A|N/A|
 
 ## Spring Semester
 
 | Document | Tasks | Accomplishments| Issues |
 |---|---|---|---|
-| Week 1 Status Report | | | |
-| Week 2 Status Report | | | |
-| Week 3 Status Report | | | |
+| Week 1 Status Report |N/A|N/A|N/A|
+| Week 2 Status Report |Met w/ Dr. Leonard|N/A|N/A|
+| Week 3 Status Report |Finished team contract, contacted sponsors|Finished team contract|N/A|
 | Week 4 Status Report | | | |
 | Week 5 Status Report | | | |
 | Week 6 Status Report | | | |

@@ -13,12 +13,10 @@ John Leonard
 John Leonard
 
 ## 1) Accomplishments this week ##
-   - N/A
+   - Finished on design report
 
 ## 2) Milestones to be completed next week ##
-   - Meet with Dr. Leonard
-   - Work on team contract
+   - N/A
 
 ## 3) Issues, problems or concerns ##
    - N/A
-

@@ -16,9 +16,7 @@ John Leonard
    - N/A
 
 ## 2) Milestones to be completed next week ##
-   - Meet with Dr. Leonard
-   - Work on team contract
+   - N/A
 
 ## 3) Issues, problems or concerns ##
    - N/A
-

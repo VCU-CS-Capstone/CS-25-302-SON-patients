@@ -13,13 +13,11 @@ John Leonard
 John Leonard
 
 ## 1) Accomplishments this week ##
-   - Met with team members
-   - Completed most of the team contract
-   - Submitted team survey
+   - Met w/ Dr. Leonard
 
 ## 2) Milestones to be completed next week ##
-   - Meet with Dr. Leonard
-   - Submit team contract
+   - Finish team contract
+   - Meet w/ sponsors to discuss mockups
 
 ## 3) Issues, problems or concerns ##
    - N/A
