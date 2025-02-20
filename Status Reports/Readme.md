@@ -35,8 +35,8 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 1 Status Report |N/A|N/A|N/A|
 | Week 2 Status Report |Met w/ Dr. Leonard|N/A|N/A|
 | Week 3 Status Report |Finished team contract, contacted sponsors|Finished team contract|N/A|
-| Week 4 Status Report | | | |
-| Week 5 Status Report | | | |
+| Week 4 Status Report |Met w/ sponsors, met w/ other school of nursing teams, edited Figma mockup|Gathered requirements/recommendations from sponsors|N/A|
+| Week 5 Status Report |Met w/ team, distributed work (creating app template, database research)|N/A|N/A|
 | Week 6 Status Report | | | |
 | Week 7 Status Report | | | |
 | Week 8 Status Report | | | |
