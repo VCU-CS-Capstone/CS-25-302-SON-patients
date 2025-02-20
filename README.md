@@ -3,6 +3,7 @@
 
 ## How to Run the App Locally
 - Navigate to patients-app: src/patients-app
+- run npm install
 - run command: npx expo start
 - On terminal, open the localhost link or scan with expo to use the app on your phone
 
