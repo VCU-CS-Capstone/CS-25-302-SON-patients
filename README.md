@@ -1,5 +1,12 @@
 # *Mobile Health and Wellness Program (MHWP) - Patient "Last Visit" Application*
 ## VCU School of Nursing
+
+## How to Run the App Locally
+- Navigate to patients-app: src/patients-app
+- run npm install
+- run command: npx expo start
+- On terminal, open the localhost link or scan with expo to use the app on your phone
+
 ## *Project Description*
 This project aims to create a tablet-based application for the Mobile Health and Wellness Program (MHWP), part of the VCU School of Nursing. The app allows patients to review information from past visits and survey responses while in the waiting room, helping them prepare for their appointments with clinicians. The app pulls data from a shared REDCap database and focuses on presenting key health goals in an accessible format for elderly, low-income, and low-health literacy patients. Our team plans to follow agile methodologies, conduct user research with MHWP participants, and use iterate design tools to ensure the app is user-friendly and effective in improving patient-clinician interactions.
 
