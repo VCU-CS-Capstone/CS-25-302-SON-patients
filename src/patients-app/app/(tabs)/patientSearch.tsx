@@ -12,11 +12,11 @@ import { Link } from "expo-router";
 export default function PatientSearch() {
   // Example test with fake data patients
   const patients = [
-    { id: "1", name: "John Doe" },
-    { id: "2", name: "Jane Smith" },
-    { id: "3", name: "Alice Johnson" },
-    { id: "4", name: "Bob Brown" },
-    { id: "5", name: "Charlie Davis" },
+    { id: "1", name: "John Doe", date: "9/25/16" },
+    { id: "2", name: "Jane Smith", date: "1/15/24" },
+    { id: "3", name: "Alice Johnson", date: "4/9/16" },
+    { id: "4", name: "Bob Brown", date: "8/13/11" },
+    { id: "5", name: "Charlie Davis", date: "4/12/12" },
   ];
 
   const [textColor, setTextColor] = useState("grey");
@@ -45,7 +45,7 @@ export default function PatientSearch() {
         style={[styles.input, { color: textColor }]}
         placeholder="Search for a patient"
         value={searchText}
-        onChangeText={handleSearchChange} // Trigger handleSearchChange when text changes
+        onChangeText={handleSearchChange}
       />
 
       {/* Conditionally render the patient list below the input */}
@@ -58,7 +58,9 @@ export default function PatientSearch() {
               style={styles.patientItem}
               onPress={() => handlePatientSelect(item.name)} // Trigger handlePatientSelect when a patient is selected
             >
-              <Text style={styles.patientName}>{item.name}</Text>
+              <Text style={styles.patientName}>
+                {item.name + " - " + item.date}
+              </Text>
             </TouchableOpacity>
           )}
           style={styles.dropdown}
@@ -92,9 +94,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginTop: 30,
     paddingLeft: 10,
-    fontSize: 20,
+    fontSize: 30,
     borderRadius: 5,
     outlineWidth: 0,
+    position: "relative",
   },
   patientItem: {
     backgroundColor: "white",
@@ -104,12 +107,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   patientName: {
-    fontSize: 18,
+    fontSize: 20,
     color: "black",
   },
   dropdown: {
     maxHeight: 200, // Set a maximum height to make it scrollable
-    width: "64%",
+    width: "65%",
     position: "absolute",
     top: 512, // Adjust this if needed to fit the UI
     backgroundColor: "white",

@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
     padding: 10,
     fontSize: 30,
-    color: "grey", // This is the default color
     outlineWidth: 0,
   },
   buttonContainer: {
