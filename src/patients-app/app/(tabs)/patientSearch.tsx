@@ -6,26 +6,22 @@ import {
   View,
 } from "react-native";
 import { useState } from "react";
-import {Link} from "expo-router";
+import { Link } from "expo-router";
 
 export default function PatientSearch() {
-  const [password, setPassword] = useState("");
-  const [passwordColor, setPasswordColor] = useState("grey");
+  const [textColor, setTextColor] = useState("grey");
 
-  const handlePasswordChange = (text) => {
-    setPassword(text);
-    setPasswordColor(text.length >= 1 ? "black" : "grey");
+  const handleTextChange = (text) => {
+    setTextColor(text.length >= 1 ? "black" : "grey");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Patient Search</Text>
       <TextInput
-        style={[styles.input, { color: passwordColor }]}
-        secureTextEntry={true}
-        placeholder="Password"
-        value={password}
-        onChangeText={handlePasswordChange} // Call the combined function
+        style={[styles.input, { color: textColor }]}
+        placeholder="Name"
+        onChangeText={handleTextChange}
       />
       <Link href="/ClinicianLogin" style={styles.goBack}>
         <Text>Go Back</Text>
@@ -75,7 +71,5 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 6,
     borderRadius: 10,
-  }
-
-
+  },
 });
