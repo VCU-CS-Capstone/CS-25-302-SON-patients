@@ -6,8 +6,10 @@ import {
   View,
 } from "react-native";
 import { useState } from "react";
+import { Link } from "expo-router";
 
-export default function TabOneScreen() {
+export default function ClinicianLogin() {
+
   const [password, setPassword] = useState("");
   const [passwordColor, setPasswordColor] = useState("grey");
 
@@ -24,15 +26,21 @@ export default function TabOneScreen() {
         secureTextEntry={true}
         placeholder="Password"
         value={password}
-        onChangeText={handlePasswordChange}  // Call the combined function
+        onChangeText={handlePasswordChange} // Call the combined function
       />
-
       <TouchableOpacity
         style={styles.buttonContainer}
         onPress={() => alert("Button is Pressed")}
       >
         <Text style={styles.buttonText}>Enter</Text>
       </TouchableOpacity>
+      {/* temporary navigation button for next page*/}
+      {/* <TouchableOpacity style={styles.nextPage}>
+        <Text style={styles.nextPageText}>Next Page</Text>
+      </TouchableOpacity> */}
+      <Link href="/patientSearch" style={styles.nextPage}>
+      <Text>Next Page</Text>
+      </Link>
     </View>
   );
 }
@@ -70,5 +78,13 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 40,
     color: "black",
+  },
+  nextPage: {
+    position: "absolute",
+    bottom: 50,
+    right: 50,
+    backgroundColor: "white",
+    padding: 6,
+    borderRadius: 10,
   },
 });
