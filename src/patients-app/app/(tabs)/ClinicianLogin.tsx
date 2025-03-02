@@ -9,7 +9,7 @@ import { useState } from "react";
 
 export default function TabOneScreen() {
   const [password, setPassword] = useState("");
-  const [passwordColor, setPasswordColor] = useState("black");
+  const [passwordColor, setPasswordColor] = useState("grey");
 
   const handlePasswordChange = (text) => {
     setPassword(text);
@@ -20,7 +20,7 @@ export default function TabOneScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Clinician Login</Text>
       <TextInput
-        style={[styles.input, { color: passwordColor }]} // Change the text color dynamically
+        style={[styles.input, { color: passwordColor }]}
         secureTextEntry={true}
         placeholder="Password"
         value={password}
