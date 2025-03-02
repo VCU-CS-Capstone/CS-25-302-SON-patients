@@ -9,15 +9,22 @@ import { useState } from "react";
 
 export default function TabOneScreen() {
   const [password, setPassword] = useState("");
+  const [passwordColor, setPasswordColor] = useState("black");
+
+  const handlePasswordChange = (text) => {
+    setPassword(text);
+    setPasswordColor(text.length >= 1 ? "black" : "grey");
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Clinician Login</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: passwordColor }]} // Change the text color dynamically
         secureTextEntry={true}
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}  // Call the combined function
       />
 
       <TouchableOpacity
@@ -49,7 +56,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     padding: 10,
     fontSize: 30,
-    color: "grey",
+    color: "grey", // This is the default color
     outlineWidth: 0,
   },
   buttonContainer: {
