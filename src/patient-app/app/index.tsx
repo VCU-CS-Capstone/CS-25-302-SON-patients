@@ -1,24 +1,83 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Modal, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { Modal, Text, TouchableOpacity, View, StyleSheet, Alert } from "react-native";
+import { printToFileAsync } from 'expo-print';
+import * as Sharing from 'expo-sharing';
 
 export default function Index() {
   const [isExitModalVisible, setIsExitModalVisible] = useState(false);
   const router = useRouter();
 
-  // Sample patient data (in a real app, this would come from your database)
-  const patientName = "John Doe";
+  // Sample patient data (in a real app, this would come from your database or state management)
+  const patientData = {
+    name: "John Doe",
+    birthDate: "1985-03-15", // YYYY-MM-DD format
+    bloodPressure: "120/80",
+    weight: "180 lbs",
+    bloodSugar: "95 mg/dL",
+    healthGoals: "Reduce cholesterol, increase daily exercise"
+  };
 
   const handleViewLastVisit = () => {
     router.replace('/view_last_visit');
   };
 
-  const handlePrintPDF = () => {
-    // Implement PDF printing logic
-    // This might involve using a library like react-native-print
-    console.log('Print PDF functionality to be implemented');
-  };
+  const handlePrintPDF = async () => {
+    try {
+      // Create HTML content for the PDF
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+              h1 { color: #333; }
+              .section { margin-bottom: 15px; }
+              .label { font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            <h1>Patient Medical Record</h1>
+            <div class="section">
+              <p><span class="label">Patient Name:</span> ${patientData.name}</p>
+              <p><span class="label">Date of Print:</span> ${new Date().toLocaleDateString()}</p>
+              <p><span class="label">Birth Date:</span> ${new Date(patientData.birthDate).toLocaleDateString()}</p>
+            </div>
+            <div class="section">
+              <p><span class="label">Blood Pressure:</span> ${patientData.bloodPressure}</p>
+              <p><span class="label">Weight:</span> ${patientData.weight}</p>
+              <p><span class="label">Blood Sugar:</span> ${patientData.bloodSugar}</p>
+            </div>
+            <div class="section">
+              <p><span class="label">Health Goals:</span> ${patientData.healthGoals}</p>
+            </div>
+          </body>
+        </html>
+      `;
 
+      // Generate PDF file
+      const { uri } = await printToFileAsync({
+        html: htmlContent,
+        base64: false
+      });
+
+      // Share the PDF
+      if (uri) {
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: 'Share Patient Medical Record'
+          });
+        } else {
+          Alert.alert('Sharing Unavailable', 'Unable to share PDF on this device');
+        }
+      }
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      Alert.alert('Print Error', `Unable to generate PDF: ${errorMessage}`);
+    }
+  };
+  
   const handleSettings = () => {
     router.replace('/settings');
   };
@@ -38,7 +97,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.patientName}>{patientName}</Text>
+      <Text style={styles.patientName}>{patientData.name}</Text>
       
       <TouchableOpacity onPress={handleExit} style={styles.exitButton}>
         <Text style={styles.exitButtonText}>X</Text>
