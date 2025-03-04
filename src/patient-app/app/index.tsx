@@ -8,7 +8,7 @@ export default function Index() {
   const [isExitModalVisible, setIsExitModalVisible] = useState(false);
   const router = useRouter();
 
-  // Sample patient data (in a real app, this would come from your database or state management)
+  // Sample patient data (in a real app, this would come from database)
   const patientData = {
     name: "John Doe",
     birthDate: "1985-03-15", // YYYY-MM-DD format
