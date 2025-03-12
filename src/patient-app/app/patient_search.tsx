@@ -9,12 +9,12 @@ import {
 } from "react-native";
 import { Link } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { PaginatedResponse, ParticipantLookupResponse } from "./types/participants";
 
 export default function PatientSearch() {
   const [textColor, setTextColor] = useState("grey");
   const [searchText, setSearchText] = useState("");
   const [filteredPatients, setFilteredPatients] = useState([]);
-
 
   // Retrieve session key securely
   const getSessionKey = async () => {
@@ -31,7 +31,6 @@ export default function PatientSearch() {
       return null;
     }
   };
-
 
   // Simulate an API call to fetch participants based on the search text
   const lookupParticipants = async () => {
@@ -54,8 +53,15 @@ export default function PatientSearch() {
       }),
     });
 
-    const data = await response.json();
-    setFilteredPatients(data); // Set the filtered patients data
+    // Check for a successful response
+    if (response.ok) {
+      const data = (await response.json()) as PaginatedResponse<ParticipantLookupResponse>
+      console.log("API Response:", data);
+      setFilteredPatients(data.data); // Set the filtered patients data
+    } else {
+      console.log("Error with API response:", response.status);
+      setFilteredPatients([]); // Clear patients if API call fails
+    }
   };
 
   // Handle search text change
@@ -85,24 +91,26 @@ export default function PatientSearch() {
         onChangeText={handleSearchChange}
       />
 
-      {/* Conditionally render the patient list below the input */}
-      {searchText.length > 0 && (
+      {/* Conditionally render the patient list or a message when no results found */}
+      {searchText.length > 0 && filteredPatients.length > 0 ? (
         <FlatList
           data={filteredPatients}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id ? item.id.toString() : item.name} // Handle 'id' or 'name' based on availability
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.patientItem}
-              onPress={() => handlePatientSelect(item.name)} // Trigger handlePatientSelect when a patient is selected
+              onPress={() => handlePatientSelect(item.first_name)} // Trigger handlePatientSelect when a patient is selected
             >
               <Text style={styles.patientName}>
-                {item.name + " - " + item.date}
+                {item.first_name + " - "}
               </Text>
             </TouchableOpacity>
           )}
           style={styles.dropdown}
         />
-      )}
+      ) : searchText.length > 0 ? (
+        <Text>No patients found</Text> // Show message if no results found
+      ) : null}
 
       {/* Link to go back */}
       <Link href="/clinician_login" style={styles.goBack}>

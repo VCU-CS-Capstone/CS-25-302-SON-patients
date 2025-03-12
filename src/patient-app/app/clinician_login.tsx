@@ -1,15 +1,18 @@
-
 import { useState } from "react";
 import { Link } from "expo-router";
 import React from "react";
-import { TextInput, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
 
 export default function ClinicianLogin() {
-
   const [password, setPassword] = useState("");
   const [passwordColor, setPasswordColor] = useState("grey");
-  
 
   const handlePasswordChange = (text: string) => {
     setPassword(text);
@@ -17,31 +20,46 @@ export default function ClinicianLogin() {
   };
 
   // Store session key securely
-    const storeSessionKey = async (sessionKey) => {
-      try {
-        await SecureStore.setItemAsync("sessionKey", sessionKey);
-        console.log("Session key stored successfully!");
-      } catch (error) {
-        console.log("Error storing session key", error);
-      }
-    };
-
+  const storeSessionKey = async (sessionKey) => {
+    try {
+      await SecureStore.setItemAsync("sessionKey", sessionKey);
+      console.log("Session key stored successfully!");
+    } catch (error) {
+      console.log("Error storing session key", error);
+    }
+  };
 
   const loginUser = async () => {
+    if (password.length < 1) {
+      console.log("Password is required!");
+      return;
+    }
+
     try {
-      const response = await fetch("https://cs-25-303.wyatt-herkamp.dev/api/participant/lookup", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({password}),
-      });
-      
+      const headers: Record<string, string> = {
+        // If we are sending JSON we need to tell the server so we are saying the content type of our body is JSON
+        "Content-Type": "application/json"
+      };
+      const response = await fetch(
+        "https://cs-25-303.wyatt-herkamp.dev/api/auth/login/password",
+        {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({
+            username: "admin", // Hardcoded username
+            password: password, // Password from user input
+          }),
+          credentials: "include"
+        }
+      );
+
       const data = await response.json();
 
-      if (data.sessionKey) {
-        await storeSessionKey(data.sessionKey);
+      if (data.session.session_key) {
+        await storeSessionKey(data.session.session_key); // Store the session key if login is successful
         console.log("Login Successful!");
       } else {
-        console.log("Login Failed");
+        console.log("Login Failed: Incorrect credentials or other error");
       }
     } catch (error) {
       console.log("Login Error: ", error);
@@ -58,10 +76,7 @@ export default function ClinicianLogin() {
         value={password}
         onChangeText={handlePasswordChange}
       />
-      <TouchableOpacity
-        style={styles.buttonContainer}
-        onPress={loginUser}
-      >
+      <TouchableOpacity style={styles.buttonContainer} onPress={loginUser}>
         <Text style={styles.buttonText}>Enter</Text>
       </TouchableOpacity>
       {/* temporary navigation button for next page*/}
@@ -69,7 +84,7 @@ export default function ClinicianLogin() {
         <Text style={styles.nextPageText}>Next Page</Text>
       </TouchableOpacity> */}
       <Link href="/patient_search" style={styles.nextPage}>
-      <Text>Next Page</Text>
+        <Text>Next Page</Text>
       </Link>
     </View>
   );
@@ -94,6 +109,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     padding: 10,
     fontSize: 30,
+    outlineWidth: 0,
   },
   buttonContainer: {
     margin: 40,
