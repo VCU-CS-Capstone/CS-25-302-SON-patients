@@ -3,15 +3,49 @@ import { useState } from "react";
 import { Link } from "expo-router";
 import React from "react";
 import { TextInput, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 export default function ClinicianLogin() {
 
   const [password, setPassword] = useState("");
   const [passwordColor, setPasswordColor] = useState("grey");
+  
 
   const handlePasswordChange = (text: string) => {
     setPassword(text);
     setPasswordColor(text.length >= 1 ? "black" : "grey");
+  };
+
+  // Store session key securely
+    const storeSessionKey = async (sessionKey) => {
+      try {
+        await SecureStore.setItemAsync("sessionKey", sessionKey);
+        console.log("Session key stored successfully!");
+      } catch (error) {
+        console.log("Error storing session key", error);
+      }
+    };
+
+
+  const loginUser = async () => {
+    try {
+      const response = await fetch("https://cs-25-303.wyatt-herkamp.dev/api/participant/lookup", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({password}),
+      });
+      
+      const data = await response.json();
+
+      if (data.sessionKey) {
+        await storeSessionKey(data.sessionKey);
+        console.log("Login Successful!");
+      } else {
+        console.log("Login Failed");
+      }
+    } catch (error) {
+      console.log("Login Error: ", error);
+    }
   };
 
   return (
@@ -22,11 +56,11 @@ export default function ClinicianLogin() {
         secureTextEntry={true}
         placeholder="Password"
         value={password}
-        onChangeText={handlePasswordChange} // Call the combined function
+        onChangeText={handlePasswordChange}
       />
       <TouchableOpacity
         style={styles.buttonContainer}
-        onPress={() => alert("Button is Pressed")}
+        onPress={loginUser}
       >
         <Text style={styles.buttonText}>Enter</Text>
       </TouchableOpacity>
