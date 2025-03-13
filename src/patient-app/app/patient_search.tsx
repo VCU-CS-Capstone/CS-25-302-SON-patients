@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Text, View, FlatList } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, Text, View, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Link } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { ParticipantLookupResponse } from './types/participants';
@@ -53,6 +53,7 @@ export default function PatientSearch() {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={styles.container}>
       <Text style={styles.title}>Patient Search</Text>
       <TextInput
@@ -70,6 +71,7 @@ export default function PatientSearch() {
         <Text>Go Back</Text>
       </Link>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 function ParticipantsList({

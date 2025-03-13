@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { TextInput, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { TextInput, View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import React from 'react';
 
 export default function ClinicianLogin() {
   const [password, setPassword] = useState('');
@@ -54,6 +55,7 @@ export default function ClinicianLogin() {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={styles.container}>
       <Text style={styles.title}>Clinician Login</Text>
       <TextInput
@@ -71,6 +73,7 @@ export default function ClinicianLogin() {
         <Text style={styles.buttonText}>Enter</Text>
       </TouchableOpacity>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 
