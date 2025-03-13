@@ -38,7 +38,7 @@ export default function ClinicianLogin() {
     try {
       const headers: Record<string, string> = {
         // If we are sending JSON we need to tell the server so we are saying the content type of our body is JSON
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       };
       const response = await fetch(
         "https://cs-25-303.wyatt-herkamp.dev/api/auth/login/password",
@@ -49,7 +49,7 @@ export default function ClinicianLogin() {
             username: "admin", // Hardcoded username
             password: password, // Password from user input
           }),
-          credentials: "include"
+          credentials: "include",
         }
       );
 

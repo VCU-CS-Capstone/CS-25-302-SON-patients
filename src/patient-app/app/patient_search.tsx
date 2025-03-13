@@ -9,7 +9,10 @@ import {
 } from "react-native";
 import { Link } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { PaginatedResponse, ParticipantLookupResponse } from "./types/participants";
+import {
+  PaginatedResponse,
+  ParticipantLookupResponse,
+} from "./types/participants";
 
 export default function PatientSearch() {
   const [textColor, setTextColor] = useState("grey");
@@ -41,21 +44,25 @@ export default function PatientSearch() {
     }
 
     // Example API call with the session key for authorization
-    const response = await fetch("https://cs-25-303.wyatt-herkamp.dev/api/participant/lookup", {
-      method: "POST",
-      headers: {
-        Authorization: `Session ${sessionKey}`, // Using the session key for authorization
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        first_name: searchText.split(" ")[0],
-        last_name: searchText.split(" ")[1],
-      }),
-    });
+    const response = await fetch(
+      "https://cs-25-303.wyatt-herkamp.dev/api/participant/lookup",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Session ${sessionKey}`, // Using the session key for authorization
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: searchText.split(" ")[0],
+          last_name: searchText.split(" ")[1],
+        }),
+      }
+    );
 
     // Check for a successful response
     if (response.ok) {
-      const data = (await response.json()) as PaginatedResponse<ParticipantLookupResponse>
+      const data =
+        (await response.json()) as PaginatedResponse<ParticipantLookupResponse>;
       console.log("API Response:", data);
       setFilteredPatients(data.data); // Set the filtered patients data
     } else {
@@ -95,15 +102,13 @@ export default function PatientSearch() {
       {searchText.length > 0 && filteredPatients.length > 0 ? (
         <FlatList
           data={filteredPatients}
-          keyExtractor={(item) => item.id ? item.id.toString() : item.name} // Handle 'id' or 'name' based on availability
+          keyExtractor={(item) => (item.id ? item.id.toString() : item.name)} // Handle 'id' or 'name' based on availability
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.patientItem}
               onPress={() => handlePatientSelect(item.first_name)} // Trigger handlePatientSelect when a patient is selected
             >
-              <Text style={styles.patientName}>
-                {item.first_name + " - "}
-              </Text>
+              <Text style={styles.patientName}>{item.first_name + " - "}</Text>
             </TouchableOpacity>
           )}
           style={styles.dropdown}
