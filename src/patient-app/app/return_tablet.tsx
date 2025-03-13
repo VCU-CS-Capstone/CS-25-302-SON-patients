@@ -13,7 +13,7 @@ export default function ReturnTabletScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Please return this tablet to a staff member.</Text>
-      
+
       <TouchableOpacity onPress={handleOkay} style={styles.button}>
         <Text style={styles.buttonText}>Okay</Text>
       </TouchableOpacity>

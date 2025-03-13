@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Modal, Text, TouchableOpacity, View, StyleSheet, Alert } from "react-native";
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Modal, Text, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
 import { printToFileAsync } from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
@@ -10,12 +10,12 @@ export default function Index() {
 
   // Sample patient data (in a real app, this would come from database)
   const patientData = {
-    name: "John Doe",
-    birthDate: "1985-03-15", // YYYY-MM-DD format
-    bloodPressure: "120/80",
-    weight: "180 lbs",
-    bloodSugar: "95 mg/dL",
-    healthGoals: "Reduce cholesterol, increase daily exercise"
+    name: 'John Doe',
+    birthDate: '1985-03-15', // YYYY-MM-DD format
+    bloodPressure: '120/80',
+    weight: '180 lbs',
+    bloodSugar: '95 mg/dL',
+    healthGoals: 'Reduce cholesterol, increase daily exercise',
   };
 
   const handleViewLastVisit = () => {
@@ -57,7 +57,7 @@ export default function Index() {
       // Generate PDF file
       const { uri } = await printToFileAsync({
         html: htmlContent,
-        base64: false
+        base64: false,
       });
 
       // Share the PDF
@@ -65,7 +65,7 @@ export default function Index() {
         if (await Sharing.isAvailableAsync()) {
           await Sharing.shareAsync(uri, {
             mimeType: 'application/pdf',
-            dialogTitle: 'Share Patient Medical Record'
+            dialogTitle: 'Share Patient Medical Record',
           });
         } else {
           Alert.alert('Sharing Unavailable', 'Unable to share PDF on this device');
@@ -77,7 +77,7 @@ export default function Index() {
       Alert.alert('Print Error', `Unable to generate PDF: ${errorMessage}`);
     }
   };
-  
+
   const handleSettings = () => {
     router.replace('/settings');
   };
@@ -98,7 +98,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Text style={styles.patientName}>{patientData.name}</Text>
-      
+
       <TouchableOpacity onPress={handleExit} style={styles.exitButton}>
         <Text style={styles.exitButtonText}>X</Text>
       </TouchableOpacity>
@@ -117,11 +117,7 @@ export default function Index() {
         </TouchableOpacity>
       </View>
 
-      <Modal
-        transparent={true}
-        visible={isExitModalVisible}
-        animationType="slide"
-      >
+      <Modal transparent={true} visible={isExitModalVisible} animationType="slide">
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalText}>Are you sure you want to exit?</Text>
