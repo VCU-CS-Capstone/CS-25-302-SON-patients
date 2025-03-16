@@ -68,14 +68,15 @@ export default function PatientSearch() {
 
   // Handle patient selection
   const handlePatientSelect = (patientName: string) => {
-    alert(`Selected patient: ${patientName}`);
+    setSearchText(patientName); // Set the input to the selected patient's name
     setShowDropdown(false); // Hide dropdown when patient is selected
   };
 
+  // Handle the submission of the form
   const handleSubmit = () => {
     console.log(`submitted Data: ${submitData}`);
     setSubmitData('');
-  }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -93,7 +94,7 @@ export default function PatientSearch() {
           <ParticipantsList 
             participants={filteredPatients} 
             searchText={searchText} 
-            setShowDropdown={setShowDropdown} // Pass setShowDropdown to ParticipantsList
+            handlePatientSelect={handlePatientSelect} // Pass handlePatientSelect to ParticipantsList
           />
         )}
 
@@ -113,11 +114,11 @@ export default function PatientSearch() {
 function ParticipantsList({
   participants,
   searchText,
-  setShowDropdown, // Receive setShowDropdown from the parent
+  handlePatientSelect, // Receive handlePatientSelect from the parent
 }: {
   participants: ParticipantLookupResponse[];
   searchText: string;
-  setShowDropdown: React.Dispatch<React.SetStateAction<boolean>>; // SetState type for setShowDropdown
+  handlePatientSelect: (patientName: string) => void; // Type for the handlePatientSelect function
 }) {
   if (participants.length === 0 && searchText.length === 0) {
     return <Text>No patients found</Text>;
@@ -127,23 +128,34 @@ function ParticipantsList({
     <FlatList
       data={participants}
       keyExtractor={(item) => item.id.toString()} // Handle 'id' or 'name' based on availability
-      renderItem={({ item }) => <ParticipantItem participant={item} setShowDropdown={setShowDropdown} />} // Pass setShowDropdown to ParticipantItem
+      renderItem={({ item }) => (
+        <ParticipantItem 
+          participant={item} 
+          handlePatientSelect={handlePatientSelect} // Pass handlePatientSelect to ParticipantItem
+        />
+      )}
       style={styles.dropdown}
     />
   );
 }
 
-function ParticipantItem({ participant, setShowDropdown }: { participant: ParticipantLookupResponse; setShowDropdown: React.Dispatch<React.SetStateAction<boolean>>; }) {
+function ParticipantItem({
+  participant,
+  handlePatientSelect
+}: { 
+  participant: ParticipantLookupResponse; 
+  handlePatientSelect: (patientName: string) => void; 
+}) {
   // Handle when a patient is selected
-  const handlePatientSelect = () => {
+  const handlePatientSelectLocal = () => {
     console.log(`Selected patient: ID = ${participant.id}, Name = ${participant.first_name} ${participant.last_name}`); // Log the ID, first name, and last name
-    setShowDropdown(false);
+    handlePatientSelect(`${participant.first_name} ${participant.last_name}`); // Update input with selected patient's name
   };
 
   return (
     <TouchableOpacity
       style={styles.patientItem}
-      onPress={() => handlePatientSelect()} // Trigger handlePatientSelect when a patient is selected
+      onPress={handlePatientSelectLocal} // Trigger handlePatientSelect when a patient is selected
     >
       <Text style={styles.patientName}>{participant.first_name + ' ' + participant.last_name}</Text>
     </TouchableOpacity>
