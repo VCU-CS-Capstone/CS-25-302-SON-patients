@@ -103,8 +103,8 @@ export default function PatientSearch() {
           />
         )}
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text>Submit</Text>
+        <TouchableOpacity style={styles.submitContainer} onPress={handleSubmit}>
+          <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
 
         {/* Link to go back */}
@@ -164,11 +164,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#B9CE88',
     padding: 20,
   },
   title: {
+    position: 'relative',
+    top: 275,
     fontSize: 40,
     fontWeight: 'bold',
     color: 'black',
@@ -183,6 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     outlineWidth: 0,
     position: 'relative',
+    top: 275
   },
   patientItem: {
     backgroundColor: 'white',
@@ -196,10 +198,10 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   dropdown: {
-    maxHeight: 200,
-    width: '65%',
+    maxHeight: 270,
+    width: '68%',
     position: 'absolute',
-    top: 512,
+    top: 450,
     backgroundColor: 'white',
     borderRadius: 5,
     zIndex: 1,
@@ -211,13 +213,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 6,
     borderRadius: 10,
+    fontSize: 27
   },
-  submitButton: {
+  submitContainer: {
     position: 'absolute',
-    backgroundColor: 'white',
     bottom: 30,
     right: 50,
+    backgroundColor: 'white',
     padding: 6,
     borderRadius: 10,
   },
+  submitText: {
+    fontSize: 27
+  }
 });
