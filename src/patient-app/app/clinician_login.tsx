@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { TextInput, View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 
@@ -56,23 +64,23 @@ export default function ClinicianLogin() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <View style={styles.container}>
-      <Text style={styles.title}>Clinician Login</Text>
-      <TextInput
-        style={[styles.input, { color: passwordColor }]}
-        secureTextEntry
-        placeholder="Password"
-        value={password}
-        onChangeText={handlePasswordChange}
-      />
+      <View style={styles.container}>
+        <Text style={styles.title}>Clinician Login</Text>
+        <TextInput
+          style={[styles.input, { color: passwordColor }]}
+          secureTextEntry
+          placeholder="Password"
+          value={password}
+          onChangeText={handlePasswordChange}
+        />
 
-      {/* Show error message if login fails */}
-      {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+        {/* Show error message if login fails */}
+        {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
 
-      <TouchableOpacity style={styles.buttonContainer} onPress={loginUser}>
-        <Text style={styles.buttonText}>Enter</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.buttonContainer} onPress={loginUser}>
+          <Text style={styles.buttonText}>Enter</Text>
+        </TouchableOpacity>
+      </View>
     </TouchableWithoutFeedback>
   );
 }
@@ -96,7 +104,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     padding: 10,
     fontSize: 30,
-    outlineWidth: 0
+    outlineWidth: 0,
   },
   errorMessage: {
     color: 'red',

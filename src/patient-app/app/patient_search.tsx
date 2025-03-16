@@ -7,7 +7,7 @@ import {
   View,
   FlatList,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
 } from 'react-native';
 import { Link } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -18,8 +18,8 @@ export default function PatientSearch() {
   const [textColor, setTextColor] = useState('grey');
   const [searchText, setSearchText] = useState('');
   const [filteredPatients, setParticipants] = useState<ParticipantLookupResponse[]>([]);
-  const [submitData, setSubmitData] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false); // Control visibility of dropdown
+  const [submitData, setSubmitData] = useState<ParticipantLookupResponse | null>(null); // Store the full patient data
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // Retrieve session key securely
   const getSessionKey = async () => {
@@ -39,7 +39,7 @@ export default function PatientSearch() {
 
   // Simulate an API call to fetch participants based on the search text
   const lookupParticipants = async () => {
-    const sessionKey = await getSessionKey(); // Retrieve the session key from Secure Store
+    const sessionKey = await getSessionKey();
     if (!sessionKey) {
       console.log('Session key is missing!');
       return;
@@ -58,24 +58,29 @@ export default function PatientSearch() {
     setSearchText(text);
     setTextColor(text.length >= 1 ? 'black' : 'grey');
     if (text.length >= 1) {
-      lookupParticipants(); // Lookup participants when search text changes
+      lookupParticipants();
       setShowDropdown(true);
     } else {
-      setParticipants([]); 
+      setParticipants([]);
       setShowDropdown(false);
     }
   };
 
   // Handle patient selection
-  const handlePatientSelect = (patientName: string) => {
-    setSearchText(patientName); // Set the input to the selected patient's name
-    setShowDropdown(false); // Hide dropdown when patient is selected
+  const handlePatientSelect = (patient: ParticipantLookupResponse) => {
+    setSearchText(`${patient.first_name} ${patient.last_name}`);
+    setSubmitData(patient); // Store the full patient data
+    setShowDropdown(false);
+    console.log(`Patient Selected: ${patient.first_name} ${patient.last_name} ID: ${patient.id}`);
   };
 
   // Handle the submission of the form
   const handleSubmit = () => {
-    console.log(`submitted Data: ${submitData}`);
-    setSubmitData('');
+    if (submitData) {
+      console.log('Submitted Data:', submitData);
+    } else {
+      console.log('No patient selected!');
+    }
   };
 
   return (
@@ -91,10 +96,10 @@ export default function PatientSearch() {
 
         {/* Conditionally render the patient list or a message when no results found */}
         {showDropdown && (
-          <ParticipantsList 
-            participants={filteredPatients} 
-            searchText={searchText} 
-            handlePatientSelect={handlePatientSelect} // Pass handlePatientSelect to ParticipantsList
+          <ParticipantsList
+            participants={filteredPatients}
+            searchText={searchText}
+            handlePatientSelect={handlePatientSelect}
           />
         )}
 
@@ -114,11 +119,11 @@ export default function PatientSearch() {
 function ParticipantsList({
   participants,
   searchText,
-  handlePatientSelect, // Receive handlePatientSelect from the parent
+  handlePatientSelect,
 }: {
   participants: ParticipantLookupResponse[];
   searchText: string;
-  handlePatientSelect: (patientName: string) => void; // Type for the handlePatientSelect function
+  handlePatientSelect: (patient: ParticipantLookupResponse) => void; // Update to expect full patient object
 }) {
   if (participants.length === 0 && searchText.length === 0) {
     return <Text>No patients found</Text>;
@@ -127,12 +132,9 @@ function ParticipantsList({
   return (
     <FlatList
       data={participants}
-      keyExtractor={(item) => item.id.toString()} // Handle 'id' or 'name' based on availability
+      keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
-        <ParticipantItem 
-          participant={item} 
-          handlePatientSelect={handlePatientSelect} // Pass handlePatientSelect to ParticipantItem
-        />
+        <ParticipantItem participant={item} handlePatientSelect={handlePatientSelect} />
       )}
       style={styles.dropdown}
     />
@@ -141,22 +143,18 @@ function ParticipantsList({
 
 function ParticipantItem({
   participant,
-  handlePatientSelect
-}: { 
-  participant: ParticipantLookupResponse; 
-  handlePatientSelect: (patientName: string) => void; 
+  handlePatientSelect,
+}: {
+  participant: ParticipantLookupResponse;
+  handlePatientSelect: (patient: ParticipantLookupResponse) => void;
 }) {
-  // Handle when a patient is selected
+  // Handle patient selection
   const handlePatientSelectLocal = () => {
-    console.log(`Selected patient: ID = ${participant.id}, Name = ${participant.first_name} ${participant.last_name}`); // Log the ID, first name, and last name
-    handlePatientSelect(`${participant.first_name} ${participant.last_name}`); // Update input with selected patient's name
+    handlePatientSelect(participant); // Pass full patient data to handlePatientSelect
   };
 
   return (
-    <TouchableOpacity
-      style={styles.patientItem}
-      onPress={handlePatientSelectLocal} // Trigger handlePatientSelect when a patient is selected
-    >
+    <TouchableOpacity style={styles.patientItem} onPress={handlePatientSelectLocal}>
       <Text style={styles.patientName}>{participant.first_name + ' ' + participant.last_name}</Text>
     </TouchableOpacity>
   );
@@ -198,13 +196,13 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   dropdown: {
-    maxHeight: 200, // Set a maximum height to make it scrollable
+    maxHeight: 200,
     width: '65%',
     position: 'absolute',
-    top: 512, // Adjust this if needed to fit the UI
+    top: 512,
     backgroundColor: 'white',
     borderRadius: 5,
-    zIndex: 1, // Make sure the dropdown appears above other elements
+    zIndex: 1,
   },
   goBack: {
     position: 'absolute',
@@ -216,10 +214,10 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     position: 'absolute',
-    backgroundColor: "white",
+    backgroundColor: 'white',
     bottom: 30,
     right: 50,
     padding: 6,
-    borderRadius: 10
-  }
+    borderRadius: 10,
+  },
 });
