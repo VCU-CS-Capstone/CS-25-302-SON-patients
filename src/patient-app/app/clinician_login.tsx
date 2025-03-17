@@ -16,12 +16,17 @@ export default function ClinicianLogin() {
   const [password, setPassword] = useState('');
   const [passwordColor, setPasswordColor] = useState('grey');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 🔹 State for toggling password visibility
   const router = useRouter(); // Hook for navigation
 
   const handlePasswordChange = (text: string) => {
     setPassword(text);
     setPasswordColor(text.length >= 1 ? 'black' : 'grey');
     setErrorMessage(''); // Clear error message when typing
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev); // Toggle password visibility
   };
 
   // Store session key securely
@@ -66,13 +71,22 @@ export default function ClinicianLogin() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
         <Text style={styles.title}>Clinician Login</Text>
+
         <TextInput
           style={[styles.input, { color: passwordColor }]}
-          secureTextEntry
+          secureTextEntry={!showPassword} // 🔹 Toggle password visibility
           placeholder="Password"
           value={password}
           onChangeText={handlePasswordChange}
         />
+
+        {/* Show passcode checkbox */}
+        <TouchableOpacity style={styles.checkboxContainer} onPress={toggleShowPassword}>
+          <View style={[styles.checkbox, showPassword && styles.checkboxChecked]} />
+          <Text style={styles.checkboxLabel}>
+            {showPassword ? 'Hide Passcode' : 'Show Passcode'}
+          </Text>
+        </TouchableOpacity>
 
         {/* Show error message if login fails */}
         {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
@@ -99,12 +113,32 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '67%',
-    height: 50,
+    height: 60,
     backgroundColor: 'white',
     marginTop: 30,
     padding: 10,
     fontSize: 30,
     outlineWidth: 0,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: 'black',
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  checkboxChecked: {
+    backgroundColor: 'black',
+  },
+  checkboxLabel: {
+    fontSize: 18,
+    color: 'black',
   },
   errorMessage: {
     color: 'red',
@@ -112,7 +146,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonContainer: {
-    margin: 40,
+    margin: 20,
     width: 300,
     backgroundColor: 'white',
     borderRadius: 50,
