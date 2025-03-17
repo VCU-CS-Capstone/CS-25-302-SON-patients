@@ -22,6 +22,17 @@ export interface bloodPressureHistory {
   "total_pages": number;
 }
 
+export interface healthOverviewHistory {
+    "allergies": null | string;
+    "has_blood_pressure_cuff": null | boolean;
+    "height": null | number;
+    "id": number;
+    "mobility_devices": string[];
+    "participant_id": number;
+    "reported_health_conditions": null | string;
+    "takes_more_than_5_medications": null | boolean;
+}
+
 export interface ParticipantLookupResponse {
   id: number;
   first_name: string;
@@ -31,6 +42,7 @@ export interface ParticipantLookupResponse {
   program: string;
   location: number;
   bloodPressureHistory?: bloodPressureHistory;
+  healthOverviewHistory?: healthOverviewHistory;
 }
 
 export interface PaginatedResponse<T> {

@@ -68,7 +68,7 @@ export default function PatientSearch() {
 
   const fetchBloodPressureHistory = async (participantId: number) => {
     const url = `https://cs-25-303.wyatt-herkamp.dev/api/participant/stats/bp/history/${participantId}`;
-  
+
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -83,22 +83,37 @@ export default function PatientSearch() {
       console.log(err);
       return null;
     }
+  };
 
-  }
+  const fetchHealthOverview = async (participantId: number) => {
+    const url = `https://cs-25-303.wyatt-herkamp.dev/api/participant/get/${participantId}/health_overview`;
 
-  
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-  // Handle patient selection
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  };
+
   const handlePatientSelect = async (patient: ParticipantLookupResponse) => {
     setSearchText(`${patient.first_name} ${patient.last_name}`);
     const bloodPressureHistory = await fetchBloodPressureHistory(patient.id);
-    const patientHistory = {...patient, bloodPressureHistory};
+    const healthOverviewHistory = await fetchHealthOverview(patient.id);
+    const patientHistory = { ...patient, bloodPressureHistory, healthOverviewHistory };
     setSubmitData(patientHistory); // Store the full patient data
     setShowDropdown(false);
     console.log(`Patient Selected: ${patient.first_name} ${patient.last_name} ID: ${patient.id}`);
   };
 
-  // Handle the submission of the form
   const handleSubmit = () => {
     if (submitData) {
       console.log('Submitted Data:', JSON.stringify(submitData, null, 2));
@@ -113,7 +128,7 @@ export default function PatientSearch() {
         <Text style={styles.title}>Patient Search</Text>
         <TextInput
           style={[styles.input, { color: textColor }]}
-          placeholder="Search for a patient"
+          placeholder="Search for patient"
           value={searchText}
           onChangeText={handleSearchChange}
         />
