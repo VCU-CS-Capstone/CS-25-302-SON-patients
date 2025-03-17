@@ -66,10 +66,34 @@ export default function PatientSearch() {
     }
   };
 
+  const fetchBloodPressureHistory = async (participantId: number) => {
+    const url = `https://cs-25-303.wyatt-herkamp.dev/api/participant/stats/bp/history/${participantId}`;
+  
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+
+  }
+
+  
+
   // Handle patient selection
-  const handlePatientSelect = (patient: ParticipantLookupResponse) => {
+  const handlePatientSelect = async (patient: ParticipantLookupResponse) => {
     setSearchText(`${patient.first_name} ${patient.last_name}`);
-    setSubmitData(patient); // Store the full patient data
+    const bloodPressureHistory = await fetchBloodPressureHistory(patient.id);
+    const patientHistory = {...patient, bloodPressureHistory};
+    setSubmitData(patientHistory); // Store the full patient data
     setShowDropdown(false);
     console.log(`Patient Selected: ${patient.first_name} ${patient.last_name} ID: ${patient.id}`);
   };
@@ -77,7 +101,7 @@ export default function PatientSearch() {
   // Handle the submission of the form
   const handleSubmit = () => {
     if (submitData) {
-      console.log('Submitted Data:', submitData);
+      console.log('Submitted Data:', JSON.stringify(submitData, null, 2));
     } else {
       console.log('No patient selected!');
     }
@@ -184,7 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     outlineWidth: 0,
     position: 'relative',
-    top: 275
+    top: 275,
   },
   patientItem: {
     backgroundColor: 'white',
@@ -213,7 +237,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 6,
     borderRadius: 10,
-    fontSize: 27
+    fontSize: 27,
   },
   submitContainer: {
     position: 'absolute',
@@ -224,6 +248,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   submitText: {
-    fontSize: 27
-  }
+    fontSize: 27,
+  },
 });
