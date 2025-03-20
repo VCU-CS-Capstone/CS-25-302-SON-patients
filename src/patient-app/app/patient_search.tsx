@@ -122,16 +122,56 @@ export default function PatientSearch() {
     }
   };
 
+  const fetchWeightHistory = async (participantId: number) => {
+    const url = `https://cs-25-303.wyatt-herkamp.dev/api/participant/stats/weight/history/${participantId}`;
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  };
+
+  const fetchGoalsHistory = async (participantId: number) => {
+    const url = `https://cs-25-303.wyatt-herkamp.dev/api/participant/goals/${participantId}/all`;
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  };
+
   const handlePatientSelect = async (patient: ParticipantLookupResponse) => {
     setSearchText(`${patient.first_name} ${patient.last_name}`);
     const bloodPressureHistory = await fetchBloodPressureHistory(patient.id);
     const healthOverviewHistory = await fetchHealthOverview(patient.id);
     const bloodGlucoseHistory = await fetchBloodGlucoseHistory(patient.id);
+    const goalsHistory = await fetchGoalsHistory(patient.id);
+    const weightHistory = await fetchWeightHistory(patient.id);
     const patientHistory = {
       ...patient,
       bloodPressureHistory,
       healthOverviewHistory,
       bloodGlucoseHistory,
+      weightHistory,
+      goalsHistory,
     };
     setSubmitData(patientHistory); // Store the full patient data
     setShowDropdown(false);
@@ -259,9 +299,9 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     maxHeight: 270,
-    width: '68%',
+    width: '67%',
     position: 'absolute',
-    top: 700,
+    top: '60%',
     backgroundColor: 'white',
     borderRadius: 5,
     zIndex: 1,

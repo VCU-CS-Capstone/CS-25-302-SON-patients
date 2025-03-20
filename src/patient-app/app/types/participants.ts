@@ -43,6 +43,27 @@ export interface bloodGlucoseHistory {
   total_pages: number;
 }
 
+export interface weightHistory {
+  data: Array<{
+    bmi: number;
+    case_note_id: number;
+    date_of_visit: string;
+    weight: number;
+  }>;
+  total: number;
+  total_pages: number;
+}
+
+export interface goalHistory {
+    "created_at": string;
+    "goal": string;
+    "hidden_from_red_cap": boolean;
+    "id": number;
+    "is_active": boolean;
+    "participant_id": number;
+    "red_cap_index": null;
+}
+
 export interface ParticipantLookupResponse {
   id: number;
   first_name: string;
@@ -54,6 +75,7 @@ export interface ParticipantLookupResponse {
   bloodPressureHistory?: bloodPressureHistory;
   healthOverviewHistory?: healthOverviewHistory;
   bloodGlucoseHistory?: bloodGlucoseHistory;
+  weightHistory?: weightHistory;
 }
 
 export interface PaginatedResponse<T> {
