@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { ParticipantLookupResponse } from './types/participants';
 import api from '@/lib/api';
@@ -181,6 +181,11 @@ export default function PatientSearch() {
   const handleSubmit = () => {
     if (submitData) {
       console.log('Submitted Data:', JSON.stringify(submitData, null, 2));
+      // Navigate to index and pass data as params
+      router.replace({
+        pathname: '/patient_portal_home',
+        params: { patientData: JSON.stringify(submitData) }
+      });
     } else {
       console.log('No patient selected!');
     }
@@ -211,7 +216,7 @@ export default function PatientSearch() {
         </TouchableOpacity>
 
         {/* Link to go back */}
-        <Link href="/clinician_login" style={styles.goBack}>
+        <Link href="/index" style={styles.goBack}>
           <Text>Go Back</Text>
         </Link>
       </View>

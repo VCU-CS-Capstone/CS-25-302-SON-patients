@@ -1,214 +1,160 @@
+import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Modal, Text, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
-import { printToFileAsync } from 'expo-print';
-import * as Sharing from 'expo-sharing';
+import {
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import React from 'react';
 
 export default function Index() {
-  const [isExitModalVisible, setIsExitModalVisible] = useState(false);
-  const router = useRouter();
+  const [password, setPassword] = useState('');
+  const [passwordColor, setPasswordColor] = useState('grey');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 🔹 State for toggling password visibility
+  const router = useRouter(); // Hook for navigation
 
-  // Sample patient data (in a real app, this would come from database)
-  const patientData = {
-    name: 'John Doe',
-    birthDate: '1985-03-15', // YYYY-MM-DD format
-    bloodPressure: '120/80',
-    weight: '180 lbs',
-    bloodSugar: '95 mg/dL',
-    healthGoals: 'Reduce cholesterol, increase daily exercise',
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    setPasswordColor(text.length >= 1 ? 'black' : 'grey');
+    setErrorMessage(''); // Clear error message when typing
   };
 
-  const handleViewLastVisit = () => {
-    router.replace('/view_last_visit');
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev); // Toggle password visibility
   };
 
-  const handlePrintPDF = async () => {
+  // Store session key securely
+  const storeSessionKey = async (sessionKey: string) => {
     try {
-      // Create HTML content for the PDF
-      const htmlContent = `
-        <html>
-          <head>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-              h1 { color: #333; }
-              .section { margin-bottom: 15px; }
-              .label { font-weight: bold; }
-            </style>
-          </head>
-          <body>
-            <h1>Patient Medical Record</h1>
-            <div class="section">
-              <p><span class="label">Patient Name:</span> ${patientData.name}</p>
-              <p><span class="label">Date of Print:</span> ${new Date().toLocaleDateString()}</p>
-              <p><span class="label">Birth Date:</span> ${new Date(patientData.birthDate).toLocaleDateString()}</p>
-            </div>
-            <div class="section">
-              <p><span class="label">Blood Pressure:</span> ${patientData.bloodPressure}</p>
-              <p><span class="label">Weight:</span> ${patientData.weight}</p>
-              <p><span class="label">Blood Sugar:</span> ${patientData.bloodSugar}</p>
-            </div>
-            <div class="section">
-              <p><span class="label">Health Goals:</span> ${patientData.healthGoals}</p>
-            </div>
-          </body>
-        </html>
-      `;
-
-      // Generate PDF file
-      const { uri } = await printToFileAsync({
-        html: htmlContent,
-        base64: false,
-      });
-
-      // Share the PDF
-      if (uri) {
-        if (await Sharing.isAvailableAsync()) {
-          await Sharing.shareAsync(uri, {
-            mimeType: 'application/pdf',
-            dialogTitle: 'Share Patient Medical Record',
-          });
-        } else {
-          Alert.alert('Sharing Unavailable', 'Unable to share PDF on this device');
-        }
-      }
+      await SecureStore.setItemAsync('sessionKey', sessionKey);
+      console.log('Session key stored successfully!');
     } catch (error) {
-      console.error('PDF Generation Error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      Alert.alert('Print Error', `Unable to generate PDF: ${errorMessage}`);
+      console.log('Error storing session key', error);
     }
   };
 
-  const handleSettings = () => {
-    router.replace('/settings');
-  };
+  const loginUser = async () => {
+    if (password.length < 1) {
+      setErrorMessage('Password is required!');
+      return;
+    }
 
-  const handleExit = () => {
-    setIsExitModalVisible(true);
-  };
+    try {
+      const response = await fetch('https://cs-25-303.wyatt-herkamp.dev/api/auth/login/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: password }),
+        credentials: 'include',
+      });
 
-  const handleExitConfirm = () => {
-    router.replace('/return_tablet');
-    setIsExitModalVisible(false);
-  };
+      const data = await response.json();
 
-  const handleExitCancel = () => {
-    setIsExitModalVisible(false);
+      if (data.session?.session_key) {
+        await storeSessionKey(data.session.session_key);
+        console.log('Login Successful!');
+        router.replace('/patient_search'); // Navigate to next screen
+      } else {
+        setErrorMessage('Incorrect credentials');
+      }
+    } catch (error) {
+      setErrorMessage('Login Error: Network issue or server error');
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.patientName}>{patientData.name}</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Clinician Login</Text>
 
-      <TouchableOpacity onPress={handleExit} style={styles.exitButton}>
-        <Text style={styles.exitButtonText}>X</Text>
-      </TouchableOpacity>
+        <TextInput
+          style={[styles.input, { color: passwordColor }]}
+          secureTextEntry={!showPassword} // 🔹 Toggle password visibility
+          placeholder="Password"
+          value={password}
+          onChangeText={handlePasswordChange}
+        />
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleViewLastVisit} style={styles.button}>
-          <Text style={styles.buttonText}>View Last Visit</Text>
+        {/* Show passcode checkbox */}
+        <TouchableOpacity style={styles.checkboxContainer} onPress={toggleShowPassword}>
+          <View style={[styles.checkbox, showPassword && styles.checkboxChecked]} />
+          <Text style={styles.checkboxLabel}>
+            {showPassword ? 'Hide Passcode' : 'Show Passcode'}
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handlePrintPDF} style={styles.button}>
-          <Text style={styles.buttonText}>Print PDF</Text>
-        </TouchableOpacity>
+        {/* Show error message if login fails */}
+        {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
 
-        <TouchableOpacity onPress={handleSettings} style={styles.button}>
-          <Text style={styles.buttonText}>Settings</Text>
+        <TouchableOpacity style={styles.buttonContainer} onPress={loginUser}>
+          <Text style={styles.buttonText}>Enter</Text>
         </TouchableOpacity>
       </View>
-
-      <Modal transparent={true} visible={isExitModalVisible} animationType="slide">
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>Are you sure you want to exit?</Text>
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity onPress={handleExitConfirm} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleExitCancel} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>No</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e0e5d8',
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-  },
-  patientName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  exitButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    backgroundColor: 'lightgray',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
     justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#B9CE88',
   },
-  exitButtonText: {
-    fontSize: 20,
+  title: {
+    fontSize: 40,
     fontWeight: 'bold',
+    color: 'black',
+  },
+  input: {
+    width: '67%',
+    height: 60,
+    backgroundColor: 'white',
+    marginTop: 30,
+    padding: 10,
+    fontSize: 30,
+    outlineWidth: 0,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: 'black',
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  checkboxChecked: {
+    backgroundColor: 'black',
+  },
+  checkboxLabel: {
+    fontSize: 18,
+    color: 'black',
+  },
+  errorMessage: {
+    color: 'red',
+    fontSize: 18,
+    marginTop: 10,
   },
   buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  button: {
+    margin: 20,
+    width: 300,
     backgroundColor: 'white',
-    padding: 15,
-    marginVertical: 10,
-    width: '80%',
+    borderRadius: 50,
+    padding: 2,
     alignItems: 'center',
-    borderRadius: 10,
   },
   buttonText: {
-    fontSize: 18,
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  modalButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  modalButton: {
-    backgroundColor: '#e0e5d8',
-    padding: 10,
-    borderRadius: 10,
-    width: '45%',
-    alignItems: 'center',
-  },
-  modalButtonText: {
-    fontSize: 16,
+    fontSize: 40,
+    color: 'black',
   },
 });

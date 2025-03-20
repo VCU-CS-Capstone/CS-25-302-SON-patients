@@ -7,7 +7,7 @@ export default function ReturnTabletScreen() {
 
   const handleOkay = () => {
     // In a real app, this would navigate to the clinician login
-    router.replace('/clinician_login');
+    router.replace('/');
   };
 
   return (
