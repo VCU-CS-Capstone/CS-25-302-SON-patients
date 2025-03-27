@@ -178,6 +178,12 @@ export default function PatientSearch() {
     console.log(`Patient Selected: ${patient.first_name} ${patient.last_name} ID: ${patient.id}`);
   };
 
+  // const goToIndex = () => {
+  //   router.replace({
+  //     pathname: '/index',
+  //   });
+  // };
+
   const handleSubmit = () => {
     if (submitData) {
       console.log('Submitted Data:', JSON.stringify(submitData, null, 2));
@@ -215,10 +221,9 @@ export default function PatientSearch() {
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
 
-        {/* Link to go back */}
-        <Link href="/index" style={styles.goBack}>
-          <Text>Go Back</Text>
-        </Link>
+        {/* <TouchableOpacity style={styles.goBack} onPress={goToIndex}>
+          <Text style={styles.submitText}>Go Back</Text>
+        </TouchableOpacity> */}
       </View>
     </TouchableWithoutFeedback>
   );
