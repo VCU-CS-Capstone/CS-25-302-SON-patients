@@ -160,7 +160,7 @@ export default function PatientPortalHome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e0e5d8',
+    backgroundColor: '#B9CE88',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   modalButton: {
-    backgroundColor: '#e0e5d8',
+    backgroundColor: '#B9CE88',
     padding: 10,
     borderRadius: 10,
     width: '45%',
