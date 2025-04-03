@@ -1,31 +1,56 @@
-import {useEffect, useState, useRef} from 'react';
-import {Text, View, Dimensions, StyleSheet, TouchableOpacity, Modal} from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Text, View, Dimensions, StyleSheet, TouchableOpacity, Modal, UIManager, findNodeHandle } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
-const screenMultiplier = (screenHeight / 1024 + screenWidth / 1366) / 2;
+const screenWidth: number = Dimensions.get('window').width;
+const screenHeight: number = Dimensions.get('window').height;
+const screenMultiplier: number = (screenHeight / 1024 + screenWidth / 1366) / 2;
 
-export default function BloodPressureScreen({ data, navigation }) {
-  const [chartData, setChartData] = useState({
+interface ChartDataset {
+  data: number[];
+}
+
+interface ChartData {
+  labels: string[];
+  datasets: ChartDataset[];
+}
+
+interface BloodPressureScreenProps {
+  data: any;
+  navigation: any;
+}
+
+interface ButtonPosition {
+  buttonX: number;
+  buttonY: number;
+}
+
+interface BloodPressurePopupProps {
+  value: string | null;
+  date: string | null;
+  position: ButtonPosition;
+}
+
+export default function BloodPressureScreen({ data, navigation }: BloodPressureScreenProps): JSX.Element {
+  const [chartData, setChartData] = useState<ChartData>({
     labels: [],
-    datasets: [{ data: [] }],
+    datasets: [{ data: [] }, { data: [] }],
   });
 
-  const [upperModalVisible, setUpperModalVisible] = useState(false);
-  const [lowerModalVisible, setLowerModalVisible] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [label, setLabel] = useState(null);
-  const [upperButtonPosition, setUpperButtonPosition] = useState({
-    x: 0,
-    y: 0,
+  const [upperModalVisible, setUpperModalVisible] = useState<boolean>(false);
+  const [lowerModalVisible, setLowerModalVisible] = useState<boolean>(false);
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const [label, setLabel] = useState<string | null>(null);
+  const [upperButtonPosition, setUpperButtonPosition] = useState<ButtonPosition>({
+    buttonX: 0,
+    buttonY: 0,
   });
-  const upperButtonRefs = useRef([]);
-  const [lowerButtonPosition, setLowerButtonPosition] = useState({
-    x: 0,
-    y: 0,
+  const upperButtonRefs = useRef<(TouchableOpacity | null)[]>([]);
+  const [lowerButtonPosition, setLowerButtonPosition] = useState<ButtonPosition>({
+    buttonX: 0,
+    buttonY: 0,
   });
-  const lowerButtonRefs = useRef([]);
+  const lowerButtonRefs = useRef<(TouchableOpacity | null)[]>([]);
 
   useEffect(() => {
     if (data) {
@@ -42,10 +67,10 @@ export default function BloodPressureScreen({ data, navigation }) {
     }
   }, [data]);
 
-  const chartHeight = 600 * screenMultiplier;
-  const chartWidth = 850 * (chartHeight / 600);
-  const upperData = data.datasets[0].data || [];
-  const lowerData = data.datasets[1].data || [];
+  const chartHeight: number = 600 * screenMultiplier;
+  const chartWidth: number = 850 * (chartHeight / 600);
+  const upperData: number[] = data.datasets?.[0]?.data || [];
+  const lowerData: number[] = data.datasets?.[1]?.data || [];
 
   return (
     <View style={styles.graphContainer}>
@@ -75,20 +100,19 @@ export default function BloodPressureScreen({ data, navigation }) {
           withDots={false} // Hide default dots
           style={{ position: 'absolute', flex: 1, padding: 20 }}
         />
-        //x axis overlay
+        {/* x axis overlay */}
         <View style={{ flexDirection: 'row' }}>
           {upperData.map((value, index) => {
             const x = 54 + chartWidth * 0.555 * (index / upperData.length);
             const y = chartHeight * 0.85;
             return (
-              <Text
-                style={{ left: x, top: y, fontWeight: 'bold', fontSize: 24 }}>
+              <Text key={`x-axis-${index}`} style={{ left: x, top: y, fontWeight: 'bold', fontSize: 24 }}>
                 {chartData.labels[index]}
               </Text>
             );
           })}
         </View>
-        //y axis overaly
+        {/* y axis overlay */}
         <View style={{ flexDirection: 'column' }}>
           {upperData.map((value, index) => {
             const x = 0;
@@ -102,8 +126,7 @@ export default function BloodPressureScreen({ data, navigation }) {
                   index
             );
             return (
-              <Text
-                style={{ left: x, top: y, fontWeight: 'bold', fontSize: 24 }}>
+              <Text key={`y-axis-${index}`} style={{ left: x, top: y, fontWeight: 'bold', fontSize: 24 }}>
                 {axisValue}
               </Text>
             );
@@ -123,24 +146,25 @@ export default function BloodPressureScreen({ data, navigation }) {
                 (Math.max(...upperData) - Math.min(...lowerData))) *
                 (ymax - ymin);
             return (
-              <View>
+              <View key={`upper-dot-container-${index}`}>
                 <View style={[styles.fakeDot, { left: x - 20, top: y - 20 }]} />
                 <TouchableOpacity
-                  key={index}
+                  key={`upper-button-${index}`}
                   ref={(el) => (upperButtonRefs.current[index] = el)}
                   onPressIn={() => {
                     if (upperButtonRefs.current[index]) {
-                      upperButtonRefs.current[index].measure(
-                        (x, y, width, height, pageX, pageY) => {
+                      const node = findNodeHandle(upperButtonRefs.current[index]);
+                      if (node) {
+                        UIManager.measure(node, (x, y, width, height, pageX, pageY) => {
                           setUpperButtonPosition({
                             buttonX: pageX - 140,
                             buttonY: pageY - 200,
-                          }); // Adjust modal position below button
+                          });
                           setUpperModalVisible(true);
                           setSelectedValue(value + '/' + lowerData[index]);
                           setLabel(chartData.labels[index]);
-                        }
-                      );
+                        });
+                      }
                     }
                   }}
                   onPressOut={() => setUpperModalVisible(false)}
@@ -156,13 +180,13 @@ export default function BloodPressureScreen({ data, navigation }) {
           transparent={true}
           visible={upperModalVisible}
           onRequestClose={() => setUpperModalVisible(false)}>
-          <BloodSugarPopupUpper
+          <BloodPressurePopupUpper
             value={selectedValue}
             date={label}
             position={upperButtonPosition}
           />
         </Modal>
-        //Lower Buttons
+        {/* Lower Buttons */}
         <View style={StyleSheet.absoluteFill}>
           {lowerData.map((value, index) => {
             const xmin = chartWidth * 0.1;
@@ -177,24 +201,25 @@ export default function BloodPressureScreen({ data, navigation }) {
                 (ymax - ymin);
 
             return (
-              <View>
+              <View key={`lower-dot-container-${index}`}>
                 <View style={[styles.fakeDot, { left: x - 20, top: y - 20 }]} />
                 <TouchableOpacity
-                  key={index}
+                  key={`lower-button-${index}`}
                   ref={(el) => (lowerButtonRefs.current[index] = el)}
                   onPressIn={() => {
                     if (lowerButtonRefs.current[index]) {
-                      lowerButtonRefs.current[index].measure(
-                        (x, y, width, height, pageX, pageY) => {
+                      const node = findNodeHandle(lowerButtonRefs.current[index]);
+                      if (node) {
+                        UIManager.measure(node, (x, y, width, height, pageX, pageY) => {
                           setLowerButtonPosition({
                             buttonX: pageX - 140,
                             buttonY: pageY - 200,
-                          }); // Adjust modal position below button
+                          });
                           setLowerModalVisible(true);
                           setSelectedValue(upperData[index] + '/' + value);
                           setLabel(chartData.labels[index]);
-                        }
-                      );
+                        });
+                      }
                     }
                   }}
                   onPressOut={() => setLowerModalVisible(false)}
@@ -212,7 +237,7 @@ export default function BloodPressureScreen({ data, navigation }) {
         transparent={true}
         visible={lowerModalVisible}
         onRequestClose={() => setLowerModalVisible(false)}>
-        <BloodSugarPopupLower
+        <BloodPressurePopupLower
           value={selectedValue}
           date={label}
           position={lowerButtonPosition}
@@ -222,7 +247,7 @@ export default function BloodPressureScreen({ data, navigation }) {
   );
 }
 
-const BloodSugarPopupUpper = ({ value, date, position }) => {
+const BloodPressurePopupUpper = ({ value, date, position }: BloodPressurePopupProps): JSX.Element => {
   return (
     <View style={{ left: position.buttonX, top: position.buttonY }}>
       <View style={styles.modalContent}>
@@ -233,7 +258,7 @@ const BloodSugarPopupUpper = ({ value, date, position }) => {
   );
 };
 
-const BloodSugarPopupLower = ({ value, date, position }) => {
+const BloodPressurePopupLower = ({ value, date, position }: BloodPressurePopupProps): JSX.Element => {
   return (
     <View style={{ left: position.buttonX, top: position.buttonY }}>
       <View style={styles.modalContent}>

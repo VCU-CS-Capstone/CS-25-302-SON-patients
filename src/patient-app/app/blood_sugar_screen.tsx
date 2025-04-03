@@ -2,23 +2,48 @@ import React, { useEffect, useState, useRef } from "react";
 import { Text, View, Dimensions, StyleSheet, TouchableOpacity, Modal, UIManager, findNodeHandle } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
-const screenWidth = Dimensions.get("window").width;
-const screenHeight = Dimensions.get("window").height;
-const screenMultiplier = ((screenHeight / 1024) + (screenWidth/1366))/2
+const screenWidth: number = Dimensions.get("window").width;
+const screenHeight: number = Dimensions.get("window").height;
+const screenMultiplier: number = ((screenHeight / 1024) + (screenWidth/1366))/2;
 
-export default function BloodSugarScreen({ data, navigation }) {
+interface ChartDataset {
+  data: number[];
+}
+
+interface ChartData {
+  labels: string[];
+  datasets: ChartDataset[];
+}
+
+interface BloodSugarScreenProps {
+  data: any;
+  navigation: any;
+}
+
+interface ButtonPosition {
+  buttonX: number;
+  buttonY: number;
+}
+
+interface BloodSugarPopupProps {
+  value: number | null;
+  date: string | null;
+  position: ButtonPosition;
+}
+
+export default function BloodSugarScreen({ data, navigation }: BloodSugarScreenProps): JSX.Element {
   console.log(data);
   
-  const [chartData, setChartData] = useState({
+  const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [{ data: [] }],
   });
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [label, setLabel] = useState(null);
-  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
-  const buttonRefs = useRef([]);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedValue, setSelectedValue] = useState<number | null>(null);
+  const [label, setLabel] = useState<string | null>(null);
+  const [buttonPosition, setButtonPosition] = useState<ButtonPosition>({ buttonX: 0, buttonY: 0 });
+  const buttonRefs = useRef<(TouchableOpacity | null)[]>([]);
 
   useEffect(() => {
     if (data) {
@@ -35,9 +60,9 @@ export default function BloodSugarScreen({ data, navigation }) {
     }
   }, [data]);
 
-  const chartHeight = 600 * screenMultiplier;
-  const chartWidth = 850 * (chartHeight / 600);
-  const dataPoints = chartData.datasets[0].data || [];
+  const chartHeight: number = 600 * screenMultiplier;
+  const chartWidth: number = 850 * (chartHeight / 600);
+  const dataPoints: number[] = chartData.datasets[0].data || [];
 
   return (
     <View style={styles.graphContainer}>
@@ -63,65 +88,70 @@ export default function BloodSugarScreen({ data, navigation }) {
           withShadow={false}
           withInnerLines={false}
           withDots={false} // Hide default dots
-          style={{ position: "absolute" , flex:1, padding:20}}
+          style={{ position: "absolute", flex: 1, padding: 20 }}
         />
 
-        //x axis overlay
+        {/* x axis overlay */}
         <View style={{flexDirection:'row'}}>
           {dataPoints.map((value, index) => {
             const x = 54 + ((chartWidth * .555) * (index / dataPoints.length));
             const y = chartHeight * .85;
             return (
-              <Text style={{left:x, top:y, fontWeight:'bold', fontSize:24}}>{chartData.labels[index]}</Text>
-            )
+              <Text key={`x-axis-${index}`} style={{left: x, top: y, fontWeight: 'bold', fontSize: 24}}>
+                {chartData.labels[index]}
+              </Text>
+            );
           })}
         </View>
 
-        //y axis overaly
+        {/* y axis overlay */}
         <View style={{flexDirection:'column'}}>
           {dataPoints.map((value, index) => {
-            const x = 0
+            const x = 0;
             const y = (chartHeight * 0.72) - ((chartHeight * 1.2) * (index / dataPoints.length));
-            const axisValue = Math.round(Math.min(...dataPoints) + (((Math.max(...dataPoints) - Math.min(...dataPoints)) / (dataPoints.length - 1)) * index))
+            const axisValue = Math.round(Math.min(...dataPoints) + (((Math.max(...dataPoints) - Math.min(...dataPoints)) / (dataPoints.length - 1)) * index));
             return (
-              <Text style={{left:x, top:y, fontWeight:'bold', fontSize:24}}>{axisValue}</Text>
-            )
+              <Text key={`y-axis-${index}`} style={{left: x, top: y, fontWeight: 'bold', fontSize: 24}}>
+                {axisValue}
+              </Text>
+            );
           })}
         </View>
         
         {/* Overlay Buttons */}
         <View style={StyleSheet.absoluteFill}>
           {dataPoints.map((value, index) => {
-            const xmin = chartWidth*.1;
-            const xmax = chartWidth - chartWidth*.17;
-            const x = xmin + ((index / (dataPoints.length-1)) * (xmax - xmin));
-            const ymin = chartHeight*.06;
-            const ymax = chartHeight - chartHeight*.2;
+            const xmin = chartWidth * 0.1;
+            const xmax = chartWidth - chartWidth * 0.17;
+            const x = xmin + ((index / (dataPoints.length - 1)) * (xmax - xmin));
+            const ymin = chartHeight * 0.06;
+            const ymax = chartHeight - chartHeight * 0.2;
             const y = ymax - (((value - Math.min(...dataPoints)) / (Math.max(...dataPoints) - Math.min(...dataPoints))) * (ymax - ymin));
 
             return (
-              <View>
-              <View style={[styles.fakeDot, { left: x - 20, top: y - 20 }]}/>
-              <TouchableOpacity
-                key={index}
-                ref={(el) => (buttonRefs.current[index] = el)} 
-                onPressIn={() => {
-                  if (buttonRefs.current[index]) {
-                    buttonRefs.current[index].measure(
-                      (x, y, width, height, pageX, pageY) => {
-                        setButtonPosition({ buttonX: pageX - 140, buttonY: pageY - 200 }); // Adjust modal position below button
-                        setModalVisible(true);
-                        setSelectedValue(value);
-                        setLabel(chartData.labels[index])
+              <View key={`dot-container-${index}`}>
+                <View style={[styles.fakeDot, { left: x - 20, top: y - 20 }]} />
+                <TouchableOpacity
+                  key={`button-${index}`}
+                  ref={(el) => (buttonRefs.current[index] = el)} 
+                  onPressIn={() => {
+                    if (buttonRefs.current[index]) {
+                      const node = findNodeHandle(buttonRefs.current[index]);
+                      if (node) {
+                        UIManager.measure(node, (x, y, width, height, pageX, pageY) => {
+                          setButtonPosition({ buttonX: pageX - 140, buttonY: pageY - 200 }); // Adjust modal position below button
+                          setModalVisible(true);
+                          setSelectedValue(value);
+                          setLabel(chartData.labels[index]);
+                        });
                       }
-                    );
-                  }
-                }}
-                onPressOut={() => setModalVisible(false)}
-                style={[styles.point, { left: x - 10, top: y - 10 }]}
-              >
-                <View style={styles.dot} />
-              </TouchableOpacity>
+                    }
+                  }}
+                  onPressOut={() => setModalVisible(false)}
+                  style={[styles.point, { left: x - 10, top: y - 10 }]}
+                >
+                  <View style={styles.dot} />
+                </TouchableOpacity>
               </View>
             );
           })}
@@ -135,13 +165,13 @@ export default function BloodSugarScreen({ data, navigation }) {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <BloodSugarPopup value={selectedValue} date={label} position={buttonPosition}  />
+        <BloodSugarPopup value={selectedValue} date={label} position={buttonPosition} />
       </Modal>
     </View>
   );
 }
 
-const BloodSugarPopup = ({ value, date, position}) => {
+const BloodSugarPopup = ({ value, date, position }: BloodSugarPopupProps): JSX.Element => {
   return (
     <View style={{left: position.buttonX, top: position.buttonY}}>
       <View style={styles.modalContent}>
@@ -172,7 +202,7 @@ const styles = StyleSheet.create({
     height: 150 * screenMultiplier,
     borderRadius: 25,
     backgroundColor: "#FFFFFF",
-    opacity: .2
+    opacity: 0.2
   },
   modalContainer: {
     flex: 1,
@@ -198,9 +228,9 @@ const styles = StyleSheet.create({
   },
   graphContainer: {
     padding: 20 * screenMultiplier,
-    flex:1,
+    flex: 1,
     justifyContent: 'left',
-    rowGap:10 * screenMultiplier,
+    rowGap: 10 * screenMultiplier,
     backgroundColor: 'white'
   },
   modalText: {
