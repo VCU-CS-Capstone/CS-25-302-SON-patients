@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View, Dimensions, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { NavigationContainer } from '@react-navigation/native';
 
 import MainLayout from './main_layout';
 
@@ -9,26 +10,46 @@ const screenWidth: number = Dimensions.get("window").width;
 const screenHeight: number = Dimensions.get("window").height;
 const screenMultiplier: number = ((screenHeight / 1024) + (screenWidth/1366))/2;
 
-interface StatsScreenProps {
-  data?: Array<any>;
-}
-
 interface LastVisitTitleProps {
   date: string;
 }
 
-export default function StatsScreen({ data }: StatsScreenProps): JSX.Element {
+export default function StatsScreen(): JSX.Element {
   const router = useRouter();
   const params = useLocalSearchParams();
   
   // Parse patient data from params if available
-  const patientData = params.patientData 
+  const patientData = params.patientData
     ? JSON.parse(params.patientData as string)
     : null;
   
+  const testArr = [1,2,3]
+  console.log("array test: ", testArr.slice(0, 10))
+
+  const calculateLength = (length) => {if (length <= 10) {return length} else {return 10}}
+  const bloodGlucose = patientData.bloodGlucoseHistory.data || null
+  const bloodGlucoseLength = calculateLength(patientData.bloodGlucoseHistory.total)
+  const bloodGlucoseDates = bloodGlucose.map((value, index) => bloodGlucose[bloodGlucoseLength-index-1].date_of_visit)
+  const bloodGlucoseValues = bloodGlucose.map((value, index) => bloodGlucose[bloodGlucoseLength-index-1].result)
+  const bloodGlucoseNew = {labels: bloodGlucoseDates.slice(-5), datasets: [{data: bloodGlucoseValues.slice(-5)}]}
+
+  const bloodPressure = patientData.bloodPressureHistory.data || null
+  const bloodPressureLength = calculateLength(patientData.bloodPressureHistory.total)
+  const bloodPressureDates = bloodPressure.map((value, index) => bloodPressure[bloodPressureLength-index-1].date_of_visit)
+  const bloodPressureValues = bloodPressure.map((value, index) => bloodPressure[bloodPressureLength-index-1].readings)
+  const bloodPressureNew = {labels: bloodPressureDates.slice(-5), datasets: [{data: bloodPressureValues.slice(-5)}]}
+
+  const weight = patientData.weightHistory.data || null
+  const weightLength = calculateLength(patientData.weightHistory.total)
+  const weightDates = weight.map((value, index) => weight[weightLength-index-1].date_of_visit)
+  const weightValues = weight.map((value, index) => weight[weightLength-index-1].weight)
+  const weightNew = {labels: weightDates.slice(-5), datasets: [{data: weightValues.slice(-5)}]}
+
+  const dataNew = {bloodGlucose: bloodGlucoseNew, bloodPressure: bloodPressureNew, weight: weightNew}
+
   // Get the last visit date or use a default
-  const lastVisitDate = patientData?.lastVisitDate || "January 1, 2025";
-  
+  const lastVisitDate = patientData?.last_visited || bloodGlucose[0].date_of_visit || bloodPressure[0].date_of_visit || weight[0].date_of_visit || "N/A";
+
   const handleBackPress = () => {
     router.back();
   };
@@ -40,57 +61,39 @@ export default function StatsScreen({ data }: StatsScreenProps): JSX.Element {
     });
   };
 
-  // Create sample data for the tabs if no data is provided
-  const bloodSugarData = patientData?.bloodGlucoseHistory || { data: [] };
-  const bloodPressureData = patientData?.bloodPressureHistory || { data: [] };
-  const weightData = patientData?.weightHistory || { data: [] };
-  
-  const tabsData = [bloodSugarData, bloodPressureData, weightData];
-
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ backgroundColor: '#B9CE88', padding: 20 * screenMultiplier }}>
-        <TouchableOpacity onPress={handleBackPress} style={{ marginBottom: 10 * screenMultiplier }}>
+      <View style={{ flex: .15, backgroundColor: '#B9CE88', padding: 20 * screenMultiplier, flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: 60 }}> 
+        <TouchableOpacity onPress={handleBackPress}>
           <BackArrow />
         </TouchableOpacity>
-        <StatsHeader />
-      </View>
-      
-      <View style={{ flex: 1, justifyContent: 'space-between' }}>
         <View style={styles.lastVisitContainer}>
           <LastVisitTitle date={lastVisitDate} />
         </View>
-        
-        <View style={{ flex: 2 }}>
-          <MainLayout data={tabsData} />
-        </View>
-        
-        <TouchableOpacity onPress={handleHealthGoalsPress} style={{ alignItems: 'center', marginVertical: 20 * screenMultiplier }}>
+        <TouchableOpacity onPress={handleHealthGoalsPress}>
           <HealthGoalsButton />
         </TouchableOpacity>
+      </View> 
+
+      <View style={{ flex: 1, justifyContent: 'space-between' }}>
+        <View style={{ flex: 1 }}>
+          <MainLayout data={dataNew} />
+        </View>
       </View>
     </View>
   );
 }
 
-const StatsHeader = (): JSX.Element => {
-  return (
-    <View style={{ alignItems: 'center' }}>
-      <Text style={{ fontSize: 36 * screenMultiplier, fontWeight: 'bold' }}>
-        Patient Statistics
-      </Text>
-    </View>
-  );
-};
-
 const BackArrow = (): JSX.Element => {
   return (
-    <Icon
-      name="arrow-back"
-      type="material"
-      size={50 * screenMultiplier}
-      color="black"
-    />
+    <View style={{flex:1, justifyContent: 'center', flexDirection: 'columns'}}>
+      <Icon
+        name="arrow-back"
+        type="material"
+        size={100 * screenMultiplier}
+        color="black"
+      />
+    </View>
   );
 };
 
@@ -116,14 +119,14 @@ const HealthGoalsButton = (): JSX.Element => {
 
 const styles = StyleSheet.create({
   lastVisitContainer: {
-    flex: 0.5,
+    flex: 1,
     justifyContent: 'center',
   },
   lastVisitText: {
     fontSize: 68,
   },
   healthGoalsContainer: {
-    flex: 0.3,
+    flex: 1,
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',

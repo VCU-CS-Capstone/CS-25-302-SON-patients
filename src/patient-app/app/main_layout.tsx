@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Dimensions, Text, TouchableOpacity, StyleSheet, Image, Platform } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { Slot, useRouter } from 'expo-router';
 
-import BloodSugarScreen from './blood_sugar_screen';
-import BloodPressureScreen from './blood_pressure_screen';
-import WeightScreen from './weight-screen';
+import BloodSugarScreen from './blood-sugar';
+import BloodPressureScreen from './blood-pressure';
+import WeightScreen from './weight';
 
 // Define types for our route params
 type RootStackParamList = {
@@ -14,9 +13,6 @@ type RootStackParamList = {
   BloodPressure: { data: BloodPressureData };
   Weight: { data: WeightData };
 };
-
-// Define types for our navigation
-type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 // Define data types
 interface BloodSugarData {
@@ -62,33 +58,15 @@ interface RouteProps {
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 const screenMultiplier = ((screenHeight / 1024) + (screenWidth/1366))/2;
-const Stack = createStackNavigator<RootStackParamList>();
-
-const BloodSugar: React.FC<RouteProps> = ({ route }) => {
-  return (
-    <View style={styles.screen}>
-      <BloodSugarScreen data={route.params?.data} />
-    </View>
-  );
-};
-
-const BloodPressure: React.FC<RouteProps> = ({ route }) => (
-  <View style={styles.screen}>
-    <BloodPressureScreen data={route.params?.data} />
-  </View>
-);
-
-const Weight: React.FC<RouteProps> = ({ route }) => (
-  <View style={styles.screen}>
-    <WeightScreen data={route.params?.data} />
-  </View>
-);
 
 const Sidebar: React.FC<SidebarProps> = ({bloodSugarData, bloodPressureData, weightData}) => {
-  const navigation = useNavigation<NavigationProp>();
+  const router = useRouter();
   return (
     <View style={styles.sidebar}>
-      <TouchableOpacity onPress={() => navigation.navigate('BloodSugar', {data: bloodSugarData})}>
+      <TouchableOpacity onPress={() => router.push({
+      pathname: '/blood-sugar',
+      params: { data: JSON.stringify(bloodSugarData) }
+      })}>
         <View style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Blood Sugar</Text>
           <Image
@@ -97,7 +75,10 @@ const Sidebar: React.FC<SidebarProps> = ({bloodSugarData, bloodPressureData, wei
           />
         </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('BloodPressure', {data: bloodPressureData})}>
+      <TouchableOpacity onPress={() => router.push({
+      pathname: '/blood-pressure',
+      params: { data: bloodPressureData }
+      })}>
         <View style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Blood Pressure</Text>
           <Image
@@ -106,7 +87,10 @@ const Sidebar: React.FC<SidebarProps> = ({bloodSugarData, bloodPressureData, wei
           />
         </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Weight', {data: weightData})}>
+      <TouchableOpacity onPress={() => router.push({
+      pathname: '/weight',
+      params: { data: weightData }
+      })}>
         <View style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Weight</Text>
           <Image
@@ -120,30 +104,14 @@ const Sidebar: React.FC<SidebarProps> = ({bloodSugarData, bloodPressureData, wei
 };
 
 const MainLayout: React.FC<MainLayoutProps> = ({ data }) => {
-  const bloodSugarData = data[0];
-  const bloodPressureData = data[1];
-  const weightData = data[2];
+  const bloodSugarData = data.bloodGlucose;
+  const bloodPressureData = data.bloodPressure;
+  const weightData = data.weight;
   return (
     <View style={styles.container}>
       <Sidebar bloodSugarData={bloodSugarData} bloodPressureData={bloodPressureData} weightData={weightData}/>
       <View style={styles.content}>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="BloodSugar"
-            component={BloodSugar}
-            initialParams={{ data: bloodSugarData }}
-          />
-          <Stack.Screen
-            name="BloodPressure"
-            component={BloodPressure}
-            initialParams={{ data: bloodPressureData }}
-          />
-          <Stack.Screen
-            name="Weight"
-            component={Weight}
-            initialParams={{ data: weightData }}
-          />
-        </Stack.Navigator>
+        <Slot/>
       </View>
     </View>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, Dimensions, StyleSheet, TouchableOpacity, Modal, UIManager, findNodeHandle } from "react-native";
 import { LineChart } from "react-native-chart-kit";
+import { useLocalSearchParams } from 'expo-router';
 
 const screenWidth: number = Dimensions.get("window").width;
 const screenHeight: number = Dimensions.get("window").height;
@@ -31,9 +32,11 @@ interface BloodSugarPopupProps {
   position: ButtonPosition;
 }
 
-export default function BloodSugarScreen({ data, navigation }: BloodSugarScreenProps): JSX.Element {
-  console.log(data);
-  
+export default function BloodSugarScreen(): JSX.Element {
+  const {dataString} = useLocalSearchParams();
+  console.log("Data String:", dataString);
+  const data = dataString ? JSON.parse(dataString as string) : null;
+
   const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [{ data: [] }],
@@ -66,7 +69,7 @@ export default function BloodSugarScreen({ data, navigation }: BloodSugarScreenP
 
   return (
     <View style={styles.graphContainer}>
-      <Text style={styles.graphHeader}>Blood Sugar</Text>
+      <Text style={styles.graphHeader}>Blood Glucose</Text>
       <Text style={styles.graphText}>Last Visit: {chartData?.datasets?.[0]?.data?.at(-1) ?? " "} mg/dL</Text>
       <View>
         <LineChart
@@ -94,11 +97,11 @@ export default function BloodSugarScreen({ data, navigation }: BloodSugarScreenP
         {/* x axis overlay */}
         <View style={{flexDirection:'row'}}>
           {dataPoints.map((value, index) => {
-            const x = 54 + ((chartWidth * .555) * (index / dataPoints.length));
+            const x = 54 + ((chartWidth * .43) * (index / dataPoints.length));
             const y = chartHeight * .85;
             return (
               <Text key={`x-axis-${index}`} style={{left: x, top: y, fontWeight: 'bold', fontSize: 24}}>
-                {chartData.labels[index]}
+                {chartData.labels[index].substring(5)}
               </Text>
             );
           })}
