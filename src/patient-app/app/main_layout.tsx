@@ -1,11 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Dimensions, Text, TouchableOpacity, StyleSheet, Image, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Slot, useRouter } from 'expo-router';
-
-import BloodSugarScreen from './blood-sugar';
-import BloodPressureScreen from './blood-pressure';
-import WeightScreen from './weight';
+import { useRouter, usePathname } from 'expo-router';
 
 // Define types for our route params
 type RootStackParamList = {
@@ -44,7 +39,11 @@ interface SidebarProps {
 }
 
 interface MainLayoutProps {
-  data: [BloodSugarData, BloodPressureData, WeightData];
+  data: {
+    bloodGlucose: BloodSugarData;
+    bloodPressure: BloodPressureData;
+    weight: WeightData;
+  };
 }
 
 interface RouteProps {
@@ -77,7 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({bloodSugarData, bloodPressureData, wei
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push({
       pathname: '/blood-pressure',
-      params: { data: bloodPressureData }
+      params: { data: JSON.stringify(bloodPressureData) }
       })}>
         <View style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Blood Pressure</Text>
@@ -89,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({bloodSugarData, bloodPressureData, wei
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push({
       pathname: '/weight',
-      params: { data: weightData }
+      params: { data: JSON.stringify(weightData) }
       })}>
         <View style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Weight</Text>
@@ -103,15 +102,36 @@ const Sidebar: React.FC<SidebarProps> = ({bloodSugarData, bloodPressureData, wei
   );
 };
 
+// Create a default content component
+const DefaultContent = () => (
+  <View style={styles.defaultContent}>
+    <Text style={styles.defaultText}>Select a category from the sidebar</Text>
+  </View>
+);
+
 const MainLayout: React.FC<MainLayoutProps> = ({ data }) => {
-  const bloodSugarData = data.bloodGlucose;
-  const bloodPressureData = data.bloodPressure;
-  const weightData = data.weight;
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  // // Redirect to blood-sugar by default if we're on the stats screen
+  // useEffect(() => {
+  //   if (pathname === '/stats_screen') {
+  //     router.push({
+  //       pathname: '/blood-sugar',
+  //       params: { data: JSON.stringify(data.bloodGlucose) }
+  //     });
+  //   }
+  // }, [pathname]);
+
   return (
     <View style={styles.container}>
-      <Sidebar bloodSugarData={bloodSugarData} bloodPressureData={bloodPressureData} weightData={weightData}/>
+      <Sidebar 
+        bloodSugarData={data.bloodGlucose} 
+        bloodPressureData={data.bloodPressure} 
+        weightData={data.weight}
+      />
       <View style={styles.content}>
-        <Slot/>
+        <DefaultContent />
       </View>
     </View>
   );
@@ -153,7 +173,7 @@ const styles = StyleSheet.create({
     flex: 0.4,
     justifyContent: 'space-around',
     paddingBottom: 20 * screenMultiplier,
-    alignItems: 'flexStart',
+    alignItems: 'flex-start',
   },
   buttonText: {
     color: 'black',
@@ -165,8 +185,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10 * screenMultiplier,
   },
+  defaultContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  defaultText: {
+    fontSize: 24,
+    color: '#666',
+  },
   screen: {
     flex: 1,
-    alignItems: 'left',
+    alignItems: 'flex-start',
   },
 });
