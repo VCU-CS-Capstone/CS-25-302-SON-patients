@@ -1,8 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+
 
 export default function PatientGoalsScreen() {
+
+  const handleBackPress = () => {
+    router.replace('/patient_portal_home');
+  };
+
   const screenWidth = Dimensions.get('window').width;
   const screenHeight = Dimensions.get('window').height;
 
@@ -10,7 +17,7 @@ export default function PatientGoalsScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity onPress={handleBackPress} style={styles.navButton}>
           <Text style={styles.navButtonText}>Go To Health Stats</Text>
         </TouchableOpacity>
         <Text style={styles.lastVisit}>Last Visit: 04/14/25</Text>

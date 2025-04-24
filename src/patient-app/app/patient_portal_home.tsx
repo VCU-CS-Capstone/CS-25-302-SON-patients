@@ -27,8 +27,10 @@ export default function PatientPortalHome() {
 
 
   const handleViewLastVisit = () => {
-    router.replace('/view_last_visit');
-    params: { patientData: JSON.stringify(patientData) }
+    router.push({
+      pathname: '/stats-screen-tabs',
+      params: { patientData: JSON.stringify(patientData) }
+    });
   };
 
   const handlePrintPDF = async () => {

@@ -24,7 +24,7 @@ export default function ReturnTabletScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e0e5d8',
+    backgroundColor: '#B9CE88',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
