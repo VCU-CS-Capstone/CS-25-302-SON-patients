@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { CheckBox } from 'react-native-elements';
+import { CheckBox, Icon } from 'react-native-elements';
+import { useRouter } from 'expo-router';
 
 
 export default function SettingsScreen() {
+ const router = useRouter();
  const [fontSize, setFontSize] = useState(16);
  const [highContrast, setHighContrast] = useState(false);
  const [dictation, setDictation] = useState(false);
  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
-
+ const screenHeight = Dimensions.get("window").height;
+ const screenMultiplier = ((screenHeight / 1024) + (screenWidth / 1366)) / 2;
 
  useEffect(() => {
    const updateDimensions = () => {
@@ -17,13 +20,29 @@ export default function SettingsScreen() {
      setScreenWidth(width);
    };
 
-
    const subscription = Dimensions.addEventListener('change', updateDimensions);
   
    // Unsubscribe on cleanup
    return () => subscription.remove(); // Correctly remove the listener
  }, []);
 
+ const handleBackPress = () => {
+  // Navigate to patient portal home instead of going back
+  router.replace('/patient_portal_home');
+};
+
+ const BackArrow = () => {
+   return (
+     <View style={{ justifyContent: 'center' }}>
+       <Icon
+         name="arrow-back"
+         type="material"
+         size={100 * screenMultiplier}
+         color="black"
+       />
+     </View>
+   );
+ };
 
  // Define color schemes
  const COLORS = {
@@ -45,18 +64,18 @@ export default function SettingsScreen() {
    },
  };
 
-
  // Determine current color scheme
  const currentColors = highContrast ? COLORS.highContrast : COLORS.default;
-
 
  return (
    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
      {/* Header */}
      <View style={[styles.header, { backgroundColor: currentColors.header }]}>
+       <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+         <BackArrow />
+       </TouchableOpacity>
        <Text style={[styles.headerText, { color: currentColors.text }]}>Settings</Text>
      </View>
-
 
      <View style={styles.settingContainer}>
        <Text style={[styles.settingHeader, { color: currentColors.text }]}>Font Size</Text>
@@ -75,7 +94,6 @@ export default function SettingsScreen() {
        </View>
      </View>
 
-
      <View style={styles.settingContainer}>
        <Text style={[styles.settingHeader, { color: currentColors.text }]}>High Contrast</Text>
        <CheckBox
@@ -87,7 +105,6 @@ export default function SettingsScreen() {
          size={100}
        />
      </View>
-
 
      <View style={styles.settingContainer}>
        <Text style={[styles.settingHeader, { color: currentColors.text }]}>Dictation</Text>
@@ -104,7 +121,6 @@ export default function SettingsScreen() {
  );
 }
 
-
 const styles = StyleSheet.create({
  container: {
    flex: 1,
@@ -112,11 +128,18 @@ const styles = StyleSheet.create({
  header: {
    width: '100%', // Ensures the header bar takes up full width
    alignItems: 'center',
-   justifyContent: 'center',
+   flexDirection: 'row',
+   justifyContent: 'flex-start',
    height: 150, // Height of the header bar
+   paddingHorizontal: 20,
+ },
+ backButton: {
+   marginRight: 20,
  },
  headerText: {
    fontSize: 80,
+   flex: 1,
+   textAlign: 'center',
  },
  settingContainer: {
    flex: 1,
