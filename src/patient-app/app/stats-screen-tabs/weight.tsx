@@ -1,24 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Text, View, Dimensions, StyleSheet, TouchableOpacity, Modal, UIManager, findNodeHandle } from "react-native";
+import { Text, View, Dimensions, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { useLocalSearchParams } from 'expo-router';
 
-const screenWidth: number = Dimensions.get("window").width;
-const screenHeight: number = Dimensions.get("window").height;
-const screenMultiplier: number = ((screenHeight / 1024) + (screenWidth/1366))/2;
-
-interface ChartDataset {
-  data: number[];
-}
-
-interface ChartData {
+// Define types
+interface WeightData {
   labels: string[];
-  datasets: ChartDataset[];
+  datasets: {
+    data: number[];
+  }[];
+  bloodSugarData?: WeightData;
 }
 
-interface BloodSugarScreenProps {
-  data: any;
-  navigation: any;
+interface WeightScreenProps {
+  data: WeightData;
 }
 
 interface ButtonPosition {
@@ -32,12 +27,18 @@ interface BloodSugarPopupProps {
   position: ButtonPosition;
 }
 
-export default function BloodSugarScreen(): JSX.Element {
-  const {dataString} = useLocalSearchParams();
-  console.log("Data String:", dataString);
-  const data = dataString ? JSON.parse(dataString as string) : null;
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
+const screenMultiplier = ((screenHeight / 1024) + (screenWidth/1366))/2;
 
-  const [chartData, setChartData] = useState<ChartData>({
+export default function WeightScreen(): JSX.Element {
+  const params = useLocalSearchParams();
+      const patientData = params.dataNew
+          ? JSON.parse(params.dataNew as string)
+          : null;
+      const data = patientData
+  
+  const [chartData, setChartData] = useState<WeightData>({
     labels: [],
     datasets: [{ data: [] }],
   });
@@ -46,31 +47,33 @@ export default function BloodSugarScreen(): JSX.Element {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [label, setLabel] = useState<string | null>(null);
   const [buttonPosition, setButtonPosition] = useState<ButtonPosition>({ buttonX: 0, buttonY: 0 });
-  const buttonRefs = useRef<(TouchableOpacity | null)[]>([]);
+  const buttonRefs = useRef<Array<TouchableOpacity | null>>([]);
+
+  const chartHeight = 600 * screenMultiplier;
+  const chartWidth = 850 * (chartHeight / 600);
+  const dataPoints = chartData.datasets[0].data || [];
 
   useEffect(() => {
-    if (data) {
-      const normalizedData = data.bloodSugarData ? data.bloodSugarData : data;
-      if (
-        typeof normalizedData === "object" &&
-        Array.isArray(normalizedData.labels) &&
-        Array.isArray(normalizedData.datasets) &&
-        normalizedData.datasets.length > 0 &&
-        Array.isArray(normalizedData.datasets[0].data)
-      ) {
-        setChartData(normalizedData);
-      }
-    }
-  }, [data]);
-
-  const chartHeight: number = 600 * screenMultiplier;
-  const chartWidth: number = 850 * (chartHeight / 600);
-  const dataPoints: number[] = chartData.datasets[0].data || [];
+     const section = data?.weight;
+   
+     if (
+       section &&
+       typeof section === 'object' &&
+       Array.isArray(section.labels) &&
+       Array.isArray(section.datasets) &&
+       section.datasets.length > 0 &&
+       Array.isArray(section.datasets[0].data)
+     ) {
+       if (JSON.stringify(chartData) !== JSON.stringify(section)) {
+         setChartData(section);
+       }
+     }
+   }, [data, chartData]);
 
   return (
     <View style={styles.graphContainer}>
-      <Text style={styles.graphHeader}>Blood Glucose</Text>
-      <Text style={styles.graphText}>Last Visit: {chartData?.datasets?.[0]?.data?.at(-1) ?? " "} mg/dL</Text>
+      <Text style={styles.graphHeader}>Weight</Text>
+      <Text style={styles.graphText}>Last Visit: {chartData?.datasets?.[0]?.data?.at(-1) ?? " "} lbs</Text>
       <View>
         <LineChart
           data={chartData}
@@ -90,14 +93,14 @@ export default function BloodSugarScreen(): JSX.Element {
           }}
           withShadow={false}
           withInnerLines={false}
-          withDots={false} // Hide default dots
+          withDots={false}
           style={{ position: "absolute", flex: 1, padding: 20 }}
         />
 
         {/* x axis overlay */}
-        <View style={{flexDirection:'row'}}>
-          {dataPoints.map((value, index) => {
-            const x = 54 + ((chartWidth * .43) * (index / dataPoints.length));
+        <View style={{flexDirection: 'row'}}>
+          {dataPoints.map((_, index) => {
+            const x = 54 + ((chartWidth * .45) * (index / dataPoints.length));
             const y = chartHeight * .85;
             return (
               <Text key={`x-axis-${index}`} style={{left: x, top: y, fontWeight: 'bold', fontSize: 24}}>
@@ -108,11 +111,14 @@ export default function BloodSugarScreen(): JSX.Element {
         </View>
 
         {/* y axis overlay */}
-        <View style={{flexDirection:'column'}}>
-          {dataPoints.map((value, index) => {
+        <View style={{flexDirection: 'column'}}>
+          {dataPoints.map((_, index) => {
             const x = 0;
             const y = (chartHeight * 0.72) - ((chartHeight * 1.2) * (index / dataPoints.length));
-            const axisValue = Math.round(Math.min(...dataPoints) + (((Math.max(...dataPoints) - Math.min(...dataPoints)) / (dataPoints.length - 1)) * index));
+            const axisValue = Math.round(
+              Math.min(...dataPoints) + 
+              (((Math.max(...dataPoints) - Math.min(...dataPoints)) / (dataPoints.length - 1)) * index)
+            );
             return (
               <Text key={`y-axis-${index}`} style={{left: x, top: y, fontWeight: 'bold', fontSize: 24}}>
                 {axisValue}
@@ -126,28 +132,27 @@ export default function BloodSugarScreen(): JSX.Element {
           {dataPoints.map((value, index) => {
             const xmin = chartWidth * 0.1;
             const xmax = chartWidth - chartWidth * 0.17;
-            const x = xmin + ((index / (dataPoints.length - 1)) * (xmax - xmin));
+            const x = xmin + ((index / (dataPoints.length-1)) * (xmax - xmin));
             const ymin = chartHeight * 0.06;
             const ymax = chartHeight - chartHeight * 0.2;
-            const y = ymax - (((value - Math.min(...dataPoints)) / (Math.max(...dataPoints) - Math.min(...dataPoints))) * (ymax - ymin));
-
+            const y = ymax - (((value - Math.min(...dataPoints)) / 
+                     (Math.max(...dataPoints) - Math.min(...dataPoints))) * (ymax - ymin));
             return (
-              <View key={`dot-container-${index}`}>
+              <View key={`button-container-${index}`}>
                 <View style={[styles.fakeDot, { left: x - 20, top: y - 20 }]} />
                 <TouchableOpacity
                   key={`button-${index}`}
-                  ref={(el) => (buttonRefs.current[index] = el)} 
+                  ref={(el) => (buttonRefs.current[index] = el)}
                   onPressIn={() => {
                     if (buttonRefs.current[index]) {
-                      const node = findNodeHandle(buttonRefs.current[index]);
-                      if (node) {
-                        UIManager.measure(node, (x, y, width, height, pageX, pageY) => {
+                      buttonRefs.current[index]?.measure(
+                        (x, y, width, height, pageX, pageY) => {
                           setButtonPosition({ buttonX: pageX - 140, buttonY: pageY - 200 }); // Adjust modal position below button
                           setModalVisible(true);
                           setSelectedValue(value);
                           setLabel(chartData.labels[index]);
-                        });
-                      }
+                        }
+                      );
                     }
                   }}
                   onPressOut={() => setModalVisible(false)}
@@ -172,14 +177,15 @@ export default function BloodSugarScreen(): JSX.Element {
       </Modal>
     </View>
   );
-}
+};
 
-const BloodSugarPopup = ({ value, date, position }: BloodSugarPopupProps): JSX.Element => {
+const BloodSugarPopup: React.FC<BloodSugarPopupProps> = ({ value, date, position }) => {
+  console.log({ position });
   return (
-    <View style={{left: position.buttonX, top: position.buttonY}}>
+    <View style={{ left: position.buttonX, top: position.buttonY }}>
       <View style={styles.modalContent}>
         <Text style={styles.modalText}>{date}</Text>
-        <Text style={styles.modalText}>{value} mg/dL</Text>
+        <Text style={styles.modalText}>{value} lbs</Text>
       </View>
     </View>
   );
@@ -205,7 +211,7 @@ const styles = StyleSheet.create({
     height: 150 * screenMultiplier,
     borderRadius: 25,
     backgroundColor: "#FFFFFF",
-    opacity: 0.2
+    opacity: .2
   },
   modalContainer: {
     flex: 1,

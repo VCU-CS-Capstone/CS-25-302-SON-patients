@@ -28,7 +28,7 @@ export default function PatientPortalHome() {
 
   const handleViewLastVisit = () => {
     router.push({
-      pathname: '/stats_screen',
+      pathname: '/stats-screen-tabs',
       params: { patientData: JSON.stringify(patientData) }
     });
   };

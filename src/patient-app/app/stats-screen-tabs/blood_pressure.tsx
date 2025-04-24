@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, Dimensions, StyleSheet, TouchableOpacity, Modal, UIManager, findNodeHandle } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import { useLocalSearchParams } from 'expo-router';
 
 const screenWidth: number = Dimensions.get('window').width;
 const screenHeight: number = Dimensions.get('window').height;
@@ -31,8 +32,14 @@ interface BloodPressurePopupProps {
   position: ButtonPosition;
 }
 
-export default function BloodPressureScreen({ data, navigation }: BloodPressureScreenProps): JSX.Element {
-  const [chartData, setChartData] = useState<ChartData>({
+export default function BloodPressureScreen(): JSX.Element {
+  const params = useLocalSearchParams();
+      const patientData = params.dataNew
+          ? JSON.parse(params.dataNew as string)
+          : null;
+      const data = patientData
+  
+    const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [{ data: [] }, { data: [] }],
   });
@@ -53,30 +60,32 @@ export default function BloodPressureScreen({ data, navigation }: BloodPressureS
   const lowerButtonRefs = useRef<(TouchableOpacity | null)[]>([]);
 
   useEffect(() => {
-    if (data) {
-      const normalizedData = data.bloodSugarData ? data.bloodSugarData : data;
+      const section = data?.bloodPressure;
+    
       if (
-        typeof normalizedData === 'object' &&
-        Array.isArray(normalizedData.labels) &&
-        Array.isArray(normalizedData.datasets) &&
-        normalizedData.datasets.length > 0 &&
-        Array.isArray(normalizedData.datasets[0].data)
+        section &&
+        typeof section === 'object' &&
+        Array.isArray(section.labels) &&
+        Array.isArray(section.datasets) &&
+        section.datasets.length > 0 &&
+        Array.isArray(section.datasets[0].data)
       ) {
-        setChartData(normalizedData);
+        if (JSON.stringify(chartData) !== JSON.stringify(section)) {
+          setChartData(section);
+        }
       }
-    }
-  }, [data]);
+    }, [data, chartData]);
 
   const chartHeight: number = 600 * screenMultiplier;
   const chartWidth: number = 850 * (chartHeight / 600);
-  const upperData: number[] = data.datasets?.[0]?.data || [];
-  const lowerData: number[] = data.datasets?.[1]?.data || [];
+  const upperData: number[] = chartData.datasets?.[0]?.data || [];
+  const lowerData: number[] = chartData.datasets?.[1]?.data || [];
 
   return (
     <View style={styles.graphContainer}>
-      <Text style={styles.graphHeader}>Blood Pressure</Text>
+      <Text style={styles.graphHeader}>Sitting Blood Pressure</Text>
       <Text style={styles.graphText}>
-        Last Visit: {chartData?.datasets?.[0]?.data?.at(-1) ?? ' '} mmHg
+        Last Visit: {chartData?.datasets?.[0]?.data?.at(-1) ?? ' '}/{chartData?.datasets?.[1]?.data?.at(-1) ?? ' '} mmHg
       </Text>
       <View>
         <LineChart
@@ -103,11 +112,11 @@ export default function BloodPressureScreen({ data, navigation }: BloodPressureS
         {/* x axis overlay */}
         <View style={{ flexDirection: 'row' }}>
           {upperData.map((value, index) => {
-            const x = 54 + chartWidth * 0.555 * (index / upperData.length);
+            const x = 54 + chartWidth * 0.45 * (index / upperData.length);
             const y = chartHeight * 0.85;
             return (
               <Text key={`x-axis-${index}`} style={{ left: x, top: y, fontWeight: 'bold', fontSize: 24 }}>
-                {chartData.labels[index]}
+                {chartData.labels[index].substring(5)}
               </Text>
             );
           })}
