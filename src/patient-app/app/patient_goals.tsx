@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 export default function PatientGoalsScreen() {
 
   const handleBackPress = () => {
-    router.replace('/patient_portal_home');
+    router.back();
   };
 
   const screenWidth = Dimensions.get('window').width;
